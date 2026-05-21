@@ -12,10 +12,11 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->string('descripcion');
-            /* REGLA POLIMÓRFICA: Esta es una función mágica de Laravel. Al escribir esa sola línea, Laravel crea automáticamente por ti:
-                detalle_id (BigInteger, aceptando nulos).
-                detalle_type (String, para guardar cosas como App\Models\NoticiaDetalle).
-                Índices compuestos: Crea un índice de base de datos que agrupa ambas columnas, haciendo que buscar los detalles de tus módulos sea extremadamente rápido.
+            /* REGLA POLIMÓRFICA: Esta es una función de Laravel. Al escribir esa sola línea, Laravel crea automáticamente:
+                - detalle_id (BigInteger, aceptando nulos).
+                - detalle_type (String, para guardar cosas como App\Models\NoticiaDetalle).
+                - Índices compuestos: Crea un índice de base de datos que agrupa ambas columnas, 
+                    haciendo que buscar los detalles de módulos sea extremadamente rápido.
             */
             $table->nullableMorphs('detalle'); 
             

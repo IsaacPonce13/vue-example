@@ -92,76 +92,99 @@
 }
 
 :root {
+    /* Fondos y textos base */
     --background: hsl(0 0% 100%);
-    --foreground: hsl(0 0% 3.9%);
+    --foreground: hsl(213 6% 15%); /* Gris muy oscuro basado en tu paleta para suavizar la lectura */
+    
+    /* Contenedores de tarjetas y modales */
     --card: hsl(0 0% 100%);
-    --card-foreground: hsl(0 0% 3.9%);
+    --card-foreground: hsl(213 6% 15%);
     --popover: hsl(0 0% 100%);
-    --popover-foreground: hsl(0 0% 3.9%);
-    --primary: hsl(0 0% 9%);
-    --primary-foreground: hsl(0 0% 98%);
-    --secondary: hsl(0 0% 92.1%);
-    --secondary-foreground: hsl(0 0% 9%);
-    --muted: hsl(0 0% 96.1%);
-    --muted-foreground: hsl(0 0% 45.1%);
-    --accent: hsl(0 0% 96.1%);
-    --accent-foreground: hsl(0 0% 9%);
+    --popover-foreground: hsl(213 6% 15%);
+    
+    /* IDENTIDAD INSTITUCIONAL PRINCIPAL (Guinda) */
+    --primary: hsl(343 52% 33%); 
+    --primary-foreground: hsl(0 0% 98%); /* Blanco limpio para contraste */
+    
+    /* Elementos secundarios (Gris pizarra atenuado) */
+    --secondary: hsl(213 6% 93%); 
+    --secondary-foreground: hsl(213 6% 31%);
+    
+    /* Estados Muted (Apagados) */
+    --muted: hsl(213 6% 96%);
+    --muted-foreground: hsl(213 6% 45%);
+    
+    /* ACENTO DE LA PALETA (Dorado) */
+    --accent: hsl(36 36% 55%);
+    --accent-foreground: hsl(0 0% 100%);
+    
     --destructive: hsl(0 84.2% 60.2%);
     --destructive-foreground: hsl(0 0% 98%);
-    --border: hsl(0 0% 92.8%);
-    --input: hsl(0 0% 89.8%);
-    --ring: hsl(0 0% 3.9%);
-    --chart-1: hsl(12 76% 61%);
-    --chart-2: hsl(173 58% 39%);
-    --chart-3: hsl(197 37% 24%);
-    --chart-4: hsl(43 74% 66%);
-    --chart-5: hsl(27 87% 67%);
+    
+    /* Estructura física */
+    --border: hsl(213 6% 88%);
+    --input: hsl(213 6% 88%);
+    --ring: hsl(343 52% 33%); /* El anillo de enfoque brilla en guinda */
+    
+    /* Gráficos / Indicadores (Reutilizando la paleta estacional) */
+    --chart-1: hsl(343 52% 33%);
+    --chart-2: hsl(36 36% 55%);
+    --chart-3: hsl(213 6% 31%);
+    --chart-4: hsl(349 49% 38%);
+    --chart-5: hsl(344 48% 26%);
     --radius: 0.5rem;
-    --sidebar-background: hsl(0 0% 98%);
-    --sidebar-foreground: hsl(240 5.3% 26.1%);
-    --sidebar-primary: hsl(0 0% 10%);
-    --sidebar-primary-foreground: hsl(0 0% 98%);
-    --sidebar-accent: hsl(0 0% 94%);
-    --sidebar-accent-foreground: hsl(0 0% 30%);
-    --sidebar-border: hsl(0 0% 91%);
-    --sidebar-ring: hsl(217.2 91.2% 59.8%);
-    --sidebar: hsl(0 0% 98%);
+
+    /* BARRA LATERAL (SIDEBAR) - Enfoque Institucional Elegante */
+    --sidebar-background: hsl(213 6% 18%); /* Fondo Gris Pizarra elegante */
+    --sidebar-foreground: hsl(0 0% 90%);     /* Texto claro */
+    --sidebar-primary: hsl(36 36% 55%);      /* El indicador activo brilla en Dorado */
+    --sidebar-primary-foreground: hsl(0 0% 100%);
+    --sidebar-accent: hsl(343 52% 33%);     /* Elemento seleccionado se pinta en Guinda */
+    --sidebar-accent-foreground: hsl(0 0% 100%);
+    --sidebar-border: hsl(213 6% 25%);
+    --sidebar-ring: hsl(36 36% 55%);
 }
 
 .dark {
-    --background: hsl(0 0% 3.9%);
+    /* Fondos y textos base en modo oscuro */
+    --background: hsl(213 10% 10%); /* Un negro azulado muy elegante que combina con tu gris */
     --foreground: hsl(0 0% 98%);
-    --card: hsl(0 0% 3.9%);
+    
+    --card: hsl(213 10% 12%);
     --card-foreground: hsl(0 0% 98%);
-    --popover: hsl(0 0% 3.9%);
+    --popover: hsl(213 10% 12%);
     --popover-foreground: hsl(0 0% 98%);
-    --primary: hsl(0 0% 98%);
-    --primary-foreground: hsl(0 0% 9%);
-    --secondary: hsl(0 0% 14.9%);
+    
+    /* En modo oscuro, el Guinda sube un poco de tono para mantener el contraste */
+    --primary: hsl(349 49% 38%);
+    --primary-foreground: hsl(0 0% 98%);
+    
+    --secondary: hsl(213 6% 20%);
     --secondary-foreground: hsl(0 0% 98%);
-    --muted: hsl(0 0% 16.08%);
-    --muted-foreground: hsl(0 0% 63.9%);
-    --accent: hsl(0 0% 14.9%);
-    --accent-foreground: hsl(0 0% 98%);
-    --destructive: hsl(0 84% 60%);
+    
+    --muted: hsl(213 6% 16%);
+    --muted-foreground: hsl(213 6% 65%);
+    
+    /* El dorado brilla excelente sobre el fondo oscuro */
+    --accent: hsl(36 36% 55%);
+    --accent-foreground: hsl(213 10% 10%);
+    
+    --destructive: hsl(0 62.8% 30.6%);
     --destructive-foreground: hsl(0 0% 98%);
-    --border: hsl(0 0% 14.9%);
-    --input: hsl(0 0% 14.9%);
-    --ring: hsl(0 0% 83.1%);
-    --chart-1: hsl(220 70% 50%);
-    --chart-2: hsl(160 60% 45%);
-    --chart-3: hsl(30 80% 55%);
-    --chart-4: hsl(280 65% 60%);
-    --chart-5: hsl(340 75% 55%);
-    --sidebar-background: hsl(0 0% 7%);
-    --sidebar-foreground: hsl(0 0% 95.9%);
-    --sidebar-primary: hsl(360, 100%, 100%);
+    
+    --border: hsl(213 6% 22%);
+    --input: hsl(213 6% 22%);
+    --ring: hsl(36 36% 55%);
+
+    /* SIDEBAR MODO OSCURO */
+    --sidebar-background: hsl(213 10% 8%);
+    --sidebar-foreground: hsl(213 6% 75%);
+    --sidebar-primary: hsl(349 49% 38%);
     --sidebar-primary-foreground: hsl(0 0% 100%);
-    --sidebar-accent: hsl(0 0% 15.9%);
-    --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
-    --sidebar-border: hsl(0 0% 15.9%);
-    --sidebar-ring: hsl(217.2 91.2% 59.8%);
-    --sidebar: hsl(240 5.9% 10%);
+    --sidebar-accent: hsl(213 6% 18%);
+    --sidebar-accent-foreground: hsl(0 0% 98%);
+    --sidebar-border: hsl(213 6% 18%);
+    --sidebar-ring: hsl(349 49% 38%);
 }
 
 @layer base {

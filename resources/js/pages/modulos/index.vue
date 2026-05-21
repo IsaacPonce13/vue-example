@@ -42,7 +42,7 @@ const options = { responsive: true };
                 :href="modulosRoutes.create().url" 
                 as="button" 
                 id="btnNuevo"
-                class="ml-auto rounded-lg bg-black px-4 py-2 text-white hover:bg-gray-700 cursor-pointer transition-colors duration-300">
+                class="ml-auto rounded-lg bg-primary px-4 py-2 text-white hover:bg-secondary cursor-pointer transition-colors duration-300">
                 Nuevo módulo
             </Link>
         </div>
