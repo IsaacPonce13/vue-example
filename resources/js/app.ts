@@ -8,6 +8,8 @@ import { initializeFlashToast } from '@/lib/flashToast';
 import DataTable from 'datatables.net-vue3';
 import DataTablesCore from 'datatables.net';
 import 'datatables.net-dt/css/dataTables.dataTables.css';
+import { ZiggyVue } from 'ziggy-js';
+// import { Ziggy } from './ziggy';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -35,6 +37,7 @@ createInertiaApp({
         createApp({ render: () => h(App, props) })
             .use(plugin)
             .component('DataTable', DataTable)
+            .use(ZiggyVue)
             .mount(el);
     },
 });

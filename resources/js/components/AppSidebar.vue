@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { House, LayoutGrid } from 'lucide-vue-next';
+import { House, LayoutGrid, Users } from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -28,6 +28,11 @@ const mainNavItems: NavItem[] = [
         href: modulos(),
         icon: LayoutGrid,
     },
+    {
+        title: 'Usuarios',
+        href: '/usuarios',
+        icon: Users,
+    }
 ];
 
 const footerNavItems: NavItem[] = [
