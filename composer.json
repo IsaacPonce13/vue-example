@@ -11,6 +11,8 @@
     "require": {
         "php": "^8.3",
         "inertiajs/inertia-laravel": "^3.0",
+        "laravel-lang/lang": "^15.31",
+        "laravel-lang/publisher": "^16.8",
         "laravel/fortify": "^1.34",
         "laravel/framework": "^13.0",
         "laravel/tinker": "^3.0",

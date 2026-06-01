@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('primer_apellido');
             $table->string('segundo_apellido')->nullable();
-            $table->integer('numero_control')->unique();
+            $table->string('numero_control')->unique();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

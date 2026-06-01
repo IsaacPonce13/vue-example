@@ -14,18 +14,35 @@ defineOptions({
     },
 });
 
-var usuario = [
-    { id: 1, nombre: 'usuario 1', tipo_usuario: 'Tipo A' },
-    { id: 2, nombre: 'usuario 2', tipo_usuario: 'Tipo B' },
-    { id: 3, nombre: 'usuario 3', tipo_usuario: 'Tipo C' },
-];
+interface users {
+    name: string;
+    primer_apellido: string;
+    segundo_apellido: string;
+    numero_control: string;
+    id_rol: number;
+    id_dependencia: number;
+}
+interface Props {
+    usuarios: users[];
+}
 
-defineProps({ usuarios: Array });
+const props = defineProps<Props>();
+
+// defineProps({ usuarios: Object });
 
 const columns = [
-    { title: 'Id', data: 'id' },
+    { title: 'Numero de control', data: 'numero_control' },
     { title: 'Nombre', data: 'nombre' },
-    { title: 'Tipo usuario', data: 'tipo_usuario' },
+    { title: 'Rol', data: 'id_rol' },
+    { title: 'Dependencia', data: 'id_dependencia' },
+    // { title: 'Acciones', data: null, render: (usuario) => {
+    //     return `
+    //         <div class="flex gap-2">
+    //             <button class="edit-btn" data-id="${usuario.id}">Editar</button>
+    //             <button class="delete-btn" data-id="${usuario.id}">Eliminar</button>
+    //         </div>
+    //     `;
+    // } },
 ];
 const options = { responsive: true };
 </script>
@@ -49,7 +66,7 @@ const options = { responsive: true };
         </div>
         <div class="rounded-lg bg-white p-6 shadow-xl">
             <DataTable
-                :data="usuario"
+                :data="usuarios"
                 :columns="columns"
                 :options="options"
                 class="w-full"

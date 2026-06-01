@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, useForm, router, usePage } from '@inertiajs/vue3';
+import { onMounted, watch } from 'vue';
+import Swal from 'sweetalert2';
 
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
@@ -35,15 +37,15 @@ defineOptions({
 });
 
 const rolesSource = [
-    { id_rol: 1, value: 'admin', label: 'Administrador' },
-    { id_rol: 2, value: 'user', label: 'Usuario' },
-    { id_rol: 3, value: 'guest', label: 'Invitado' },
+    { id_rol: 1, value: 1, label: 'Administrador' },
+    { id_rol: 2, value: 2, label: 'Usuario' },
+    { id_rol: 3, value: 3, label: 'Invitado' },
 ];
 
 const dependenciasSource = [
-    { id_dependencia: 1, value: 'it', label: 'Departamento TI' },
-    { id_dependencia: 2, value: 'hr', label: 'Recursos Humanos' },
-    { id_dependencia: 3, value: 'finance', label: 'Finanzas' },
+    { id_dependencia: 1, value: 1, label: 'Departamento TI' },
+    { id_dependencia: 2, value: 2, label: 'Recursos Humanos' },
+    { id_dependencia: 3, value: 3, label: 'Finanzas' },
 ];
 
 const form = useForm({
@@ -60,7 +62,24 @@ const form = useForm({
 });
 
 const handleSubmit = () => {
-    form.post(route('usuarios.store'));
+    form.post(route('usuarios.store'), {
+        onSuccess: () => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Usuario creado',
+                text: 'El usuario ha sido creado exitosamente.',
+                timer: 2000,
+                showConfirmButton: false,
+            });
+        },
+        onError: (errors) => {
+            console.error('❌ [FORM] Errores de validación:', errors);
+        },
+    });
+};
+
+const handleCancel = () => {
+    router.visit(route('usuarios'));
 };
 </script>
 
@@ -69,12 +88,7 @@ const handleSubmit = () => {
     <div class="flex flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
         <h1 class="text-brand-gray text-2xl font-bold">Registrar usuario</h1>
 
-        <form
-            v-bind="form"
-            :reset-on-success="['password', 'password_confirmation']"
-            @submit="handleSubmit"
-            class="flex flex-col gap-6"
-        >
+        <form @submit.prevent="handleSubmit" class="flex flex-col gap-6">
             <div class="grid gap-6 md:grid-cols-2">
                 <div class="grid gap-2">
                     <Label for="name">Nombre(s)</Label>
@@ -82,13 +96,14 @@ const handleSubmit = () => {
                         id="name"
                         v-model="form.name"
                         type="text"
-                        required
                         autofocus
                         :tabindex="1"
                         autocomplete="nombre"
                         placeholder="Nombre(s)"
                     />
-                    <InputError :message="form.errors.name" />
+                    <p v-if="form.errors.name" class="text-sm text-red-600">
+                        {{ form.errors.name }}
+                    </p>
                 </div>
 
                 <div class="grid gap-2">
@@ -97,12 +112,17 @@ const handleSubmit = () => {
                         id="primer_apellido"
                         v-model="form.primer_apellido"
                         type="text"
-                        required
+                        autofocus
                         :tabindex="2"
                         autocomplete="primer_apellido"
                         placeholder="Ingrese el primer apellido"
                     />
-                    <InputError :message="form.errors.primer_apellido" />
+                    <p
+                        v-if="form.errors.primer_apellido"
+                        class="text-sm text-red-600"
+                    >
+                        {{ form.errors.primer_apellido }}
+                    </p>
                 </div>
 
                 <div class="grid gap-2">
@@ -111,12 +131,16 @@ const handleSubmit = () => {
                         id="segundo_apellido"
                         v-model="form.segundo_apellido"
                         type="text"
-                        required
                         :tabindex="3"
                         autocomplete="segundo_apellido"
                         placeholder="Ingrese el segundo apellido"
                     />
-                    <InputError :message="form.errors.segundo_apellido" />
+                    <p
+                        v-if="form.errors.segundo_apellido"
+                        class="text-sm text-red-600"
+                    >
+                        {{ form.errors.segundo_apellido }}
+                    </p>
                 </div>
 
                 <div class="grid gap-2">
@@ -125,17 +149,21 @@ const handleSubmit = () => {
                         id="numero_control"
                         v-model="form.numero_control"
                         type="number"
-                        required
                         :tabindex="4"
                         autocomplete="numero_control"
                         placeholder="Ingrese su número de control"
                     />
-                    <InputError :message="form.errors.numero_control" />
+                    <p
+                        v-if="form.errors.numero_control"
+                        class="text-sm text-red-600"
+                    >
+                        {{ form.errors.numero_control }}
+                    </p>
                 </div>
 
                 <div class="grid gap-2">
                     <Label for="id_rol">Rol del Usuario</Label>
-                    <Select v-model="form.id_rol" required :tabindex="5">
+                    <Select v-model="form.id_rol" :tabindex="5">
                         <SelectTrigger id="id_rol" class="w-full">
                             <SelectValue
                                 placeholder="Seleccione un rol de usuario"
@@ -154,16 +182,14 @@ const handleSubmit = () => {
                             </SelectGroup>
                         </SelectContent>
                     </Select>
-                    <InputError :message="form.errors.id_rol" />
+                    <p v-if="form.errors.id_rol" class="text-sm text-red-600">
+                        {{ form.errors.id_rol }}
+                    </p>
                 </div>
 
                 <div class="grid gap-2">
                     <Label for="id_dependencia">Dependencia</Label>
-                    <Select
-                        v-model="form.id_dependencia"
-                        required
-                        :tabindex="6"
-                    >
+                    <Select v-model="form.id_dependencia" :tabindex="6">
                         <SelectTrigger id="id_dependencia" class="w-full">
                             <SelectValue
                                 placeholder="Seleccione una dependencia"
@@ -184,7 +210,12 @@ const handleSubmit = () => {
                             </SelectGroup>
                         </SelectContent>
                     </Select>
-                    <InputError :message="form.errors.id_dependencia" />
+                    <p
+                        v-if="form.errors.id_dependencia"
+                        class="text-sm text-red-600"
+                    >
+                        {{ form.errors.id_dependencia }}
+                    </p>
                 </div>
 
                 <div class="grid gap-2">
@@ -193,12 +224,13 @@ const handleSubmit = () => {
                         id="email"
                         v-model="form.email"
                         type="email"
-                        required
                         :tabindex="7"
                         autocomplete="email"
                         placeholder="email@ejemplo.com"
                     />
-                    <InputError :message="form.errors.email" />
+                    <p v-if="form.errors.email" class="text-sm text-red-600">
+                        {{ form.errors.email }}
+                    </p>
                 </div>
 
                 <div class="grid gap-2">
@@ -209,12 +241,13 @@ const handleSubmit = () => {
                         id="email_confirmation"
                         v-model="form.email_confirmation"
                         type="email"
-                        required
                         :tabindex="8"
                         autocomplete="email"
                         placeholder="email@ejemplo.com"
                     />
-                    <InputError :message="form.errors.email_confirmation" />
+                    <p v-if="form.errors.email" class="text-sm text-red-600">
+                        {{ form.errors.email }}
+                    </p>
                 </div>
 
                 <div class="grid gap-2">
@@ -222,12 +255,13 @@ const handleSubmit = () => {
                     <PasswordInput
                         id="password"
                         v-model="form.password"
-                        required
                         :tabindex="9"
                         autocomplete="new-password"
                         placeholder="Contraseña"
                     />
-                    <InputError :message="form.errors.password" />
+                    <p v-if="form.errors.password" class="text-sm text-red-600">
+                        {{ form.errors.password }}
+                    </p>
                 </div>
 
                 <div class="grid gap-2">
@@ -237,12 +271,13 @@ const handleSubmit = () => {
                     <PasswordInput
                         id="password_confirmation"
                         v-model="form.password_confirmation"
-                        required
                         :tabindex="10"
                         autocomplete="new-password"
                         placeholder="Confirmar contraseña"
                     />
-                    <InputError :message="form.errors.password_confirmation" />
+                    <p v-if="form.errors.password" class="text-sm text-red-600">
+                        {{ form.errors.password }}
+                    </p>
                 </div>
             </div>
 
@@ -253,8 +288,18 @@ const handleSubmit = () => {
                     tabindex="11"
                     :disabled="form.processing"
                 >
-                    <Spinner v-if="form.processing" class="mr-2" />
+                    <Spinner v-if="form.processing" class="mr-2 h-4 w-4" />
                     Agregar usuario
+                </Button>
+
+                <Button
+                    type="button"
+                    class="mt-2"
+                    variant="outline"
+                    @click="handleCancel"
+                    :disabled="form.processing"
+                >
+                    Cancelar
                 </Button>
             </div>
         </form>
