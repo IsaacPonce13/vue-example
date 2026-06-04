@@ -3,6 +3,7 @@ import { Head, Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { usuarios } from '@/routes';
 import usuariosRoutes from '@/routes/usuarios';
+import { router } from '@inertiajs/vue3';
 
 // Importación normal de los iconos en PascalCase
 import {
@@ -10,9 +11,12 @@ import {
     ToggleRight,
     ToggleLeft,
     LockKeyhole,
+    Table,
 } from 'lucide-vue-next';
 
 import ModalPassword from '@/components/usuarios/modalPassword.vue';
+import Swal from 'sweetalert2';
+import { DataTable } from 'datatables.net-vue3';
 
 defineOptions({
     layout: {
@@ -54,6 +58,37 @@ const openPasswordModal = (user: users) => {
 const closePasswordModal = () => {
     isModalOpen.value = false;
     selectedUser.value = null;
+};
+
+const cambiarEstado = (id: number, active: number) => {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: `¿Quieres ${active === 1 ? 'activar' : 'desactivar'} este usuario?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#7F2841',
+        cancelButtonColor: '#4b4f54',
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            router.put(
+                `/usuarios/${id}/estado`,
+                { active },
+                {
+                    preserveScroll: true,
+                    preserveState: false, // Esto fuerza la recarga de datos
+                    onSuccess: () => {
+                        Swal.fire(
+                            '¡Hecho!',
+                            `El usuario ha sido ${active === 1 ? 'activado' : 'desactivado'}.`,
+                            'success',
+                        );
+                    },
+                },
+            );
+        }
+    });
 };
 
 const columns = [
@@ -141,14 +176,20 @@ const options = {
                             type="button"
                             class="cursor-pointer transition-colors"
                             title="Cambiar estado"
+                            @click.stop="
+                                cambiarEstado(
+                                    rowData.id,
+                                    rowData.active === 1 ? 0 : 1,
+                                )
+                            "
                         >
                             <ToggleRight
-                                v-if="rowData.active !== false"
+                                v-if="rowData.active === 1"
                                 class="h-6 w-6 text-green-600 hover:text-green-700"
                             />
                             <ToggleLeft
                                 v-else
-                                class="h-6 w-6 text-gray-400 hover:text-gray-500"
+                                class="h-6 w-6 text-red-600 hover:text-red-700"
                             />
                         </button>
 
@@ -159,13 +200,6 @@ const options = {
                         >
                             <SquarePen class="h-5 w-5" />
                         </Link>
-                        <!-- <Link
-                            :href="`/usuarios/${rowData.id}/password`"
-                            class="text-blue-600 transition-colors hover:text-blue-800"
-                            title="Editar contraseña"
-                        >
-                            <LockKeyhole class="h-5 w-5" />
-                        </Link> -->
 
                         <button
                             @click="openPasswordModal(rowData)"

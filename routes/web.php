@@ -37,6 +37,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/usuarios', [UsuariosController::class, 'store'])->name('usuarios.store');
     Route::put('/usuarios/{id}', [UsuariosController::class, 'update'])->name('usuarios.update');
     Route::put('/usuarios/{id}/password', [UsuariosController::class, 'password'])->name('usuarios.password');
+    Route::put('/usuarios/{id}/estado', [UsuariosController::class, 'estado'])->name('usuarios.estado');
 });
 
 Route::middleware('auth')->group(function () {

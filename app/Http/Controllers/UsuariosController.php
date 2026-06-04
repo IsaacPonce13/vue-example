@@ -7,6 +7,10 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
+
+
 
 class UsuariosController extends Controller
 {
@@ -22,16 +26,37 @@ class UsuariosController extends Controller
         return Inertia::render('usuarios/form');
     }
 
+
+public function generateSecurePassword($length = 16)
+{
+    $password = Str::random($length);
+    
+    $uppercase = Str::upper(Str::random(1));
+    $lowercase = Str::lower(Str::random(1));
+    $number = rand(0, 9);
+    $special = substr(str_shuffle('!@#$%^&*()_+-=[]{}|;:,.<>?'), 0, 1);
+    
+    // Combinar y mezclar
+    $password = $password . $uppercase . $lowercase . $number . $special;
+    
+    return str_shuffle($password);
+}
+
     public function store(Request $request): RedirectResponse
     {
+        $password = $this->generateSecurePassword();
+        Log::debug('An informational message {password}', ['password' => $password]);
+        $request->merge([
+            'password' => $password,
+        ]);
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'primer_apellido' => 'required|string|max:255',
-            'segundo_apellido' => 'string|max:255',
+            'segundo_apellido' => 'string|max:255|nullable',
             'numero_control' => 'required|numeric|digits_between:13,15|unique:users,numero_control',            'id_rol' => 'required|integer|exists:ca_roles,id',
             'id_dependencia' => 'required|integer|exists:ca_dependencias,id',
             'email' => 'required|string|email|max:255|unique:users|confirmed',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8',
         ], [], [
             // Alias para mensajes de error en español
             'name' => 'Nombre(s)',
@@ -73,7 +98,7 @@ class UsuariosController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'primer_apellido' => 'required|string|max:255',
-            'segundo_apellido' => 'string|max:255',
+            'segundo_apellido' => 'string|max:255|nullable',
             'numero_control' => "required|numeric|digits_between:13,15|unique:users,numero_control,$id",
             'id_rol' => 'required|integer|exists:ca_roles,id',
             'id_dependencia' => 'required|integer|exists:ca_dependencias,id',
@@ -88,7 +113,7 @@ class UsuariosController extends Controller
             'id_dependencia' => 'Dependencia',
             'email' => 'Correo electrónico',
         ]);
-
+        
         try {
             $usuario->update($data);
 
@@ -128,6 +153,27 @@ class UsuariosController extends Controller
             return back()
                 ->withErrors(['general' => 'Error al actualizar la contraseña: '.$e->getMessage()])
                 ->withInput();
+        }
+    }
+
+    public function estado(Request $request, $id)
+    {
+        $usuario = User::findOrFail($id);
+
+        $data = $request->validate([
+            'active' => 'required|integer|in:0,1',
+        ], [], [
+            'active' => 'Estado',
+        ]);
+
+        try {
+            $usuario->update(['active' => $data['active']]);
+
+            return back()->with('success', 'Estado actualizado exitosamente.');
+
+        } catch (\Exception $e) {
+            return back()
+                ->withErrors(['general' => 'Error al actualizar el estado: '.$e->getMessage()]);
         }
     }
 }
