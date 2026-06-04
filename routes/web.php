@@ -1,18 +1,17 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Features;
-use Inertia\Inertia;
 use App\Http\Controllers\ModuloController;
 use App\Http\Controllers\UsuariosController;
+use Illuminate\Support\Facades\Route;
+use Laravel\Fortify\Features;
 
 Route::inertia('/', 'Welcome', [
     'canRegister' => Features::enabled(Features::registration()),
-    ])->name('home');
-    
+])->name('home');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
-        
+
     // ==========================================
     // RUTAS DE MÓDULOS
     // ==========================================
@@ -25,7 +24,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/modulos', [ModuloController::class, 'store'])->name('modulos.store');
     Route::put('/modulos/{id}', [ModuloController::class, 'update'])->name('modulos.update');
     Route::delete('/modulos/{id}', [ModuloController::class, 'destroy'])->name('modulos.destroy');
-    
+
     // ==========================================
     // RUTAS DE USUARIOS
     // ==========================================
@@ -36,13 +35,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/usuarios/{id}/editar', [UsuariosController::class, 'edit'])->name('usuarios.edit');
     // 2. Acciones (Procesamiento de datos tras enviar formularios)
     Route::post('/usuarios', [UsuariosController::class, 'store'])->name('usuarios.store');
-    
     Route::put('/usuarios/{id}', [UsuariosController::class, 'update'])->name('usuarios.update');
-    Route::delete('/usuarios/{id}', [UsuariosController::class, 'destroy'])->name('usuarios.destroy');
+    Route::put('/usuarios/{id}/password', [UsuariosController::class, 'password'])->name('usuarios.password');
 });
 
 Route::middleware('auth')->group(function () {
     Route::inertia('profile', 'Profile')->name('profile');
-}); 
+});
 
 require __DIR__.'/settings.php';

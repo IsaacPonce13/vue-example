@@ -23,6 +23,7 @@ return new class extends Migration
             $table->rememberToken();
             $table->unsignedBigInteger('id_rol');
             $table->unsignedBigInteger('id_dependencia');
+            $table->boolean('activo')->default(true);
             $table->timestamps();
         });
 

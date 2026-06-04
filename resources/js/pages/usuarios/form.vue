@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { Head, useForm, router, usePage } from '@inertiajs/vue3';
-import { onMounted, watch } from 'vue';
+import { onMounted, watch, computed } from 'vue';
 import Swal from 'sweetalert2';
 
-import InputError from '@/components/InputError.vue';
-import PasswordInput from '@/components/PasswordInput.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,14 +20,43 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 
+interface Usuario {
+    id: number;
+    name: string;
+    primer_apellido: string;
+    segundo_apellido?: string | null;
+    numero_control: string;
+    id_rol: number;
+    id_dependencia: number;
+    email: string;
+}
+
+interface Props {
+    usuario?: Usuario;
+    isEditing?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    isEditing: false,
+});
+
+// Títulos dinámicos
+const pageTitle = computed(() =>
+    props.isEditing ? 'Editar usuario' : 'Registrar usuario',
+);
+
+const pageDescription = computed(() =>
+    props.isEditing
+        ? 'Modifica los datos del usuario seleccionado.'
+        : 'Ingresa los datos para crear un nuevo usuario en el sistema.',
+);
+
 defineOptions({
     layout: {
-        title: 'Registrar usuario',
-        description:
-            'Ingresa los datos para crear un nuevo usuario en el sistema.',
+        title: 'Usuarios',
         breadcrumbs: [
             {
-                title: 'Crear usuario',
+                title: 'Usuarios',
                 href: usuarios().url,
             },
         ],
@@ -49,33 +76,50 @@ const dependenciasSource = [
 ];
 
 const form = useForm({
-    name: '',
-    primer_apellido: '',
-    segundo_apellido: '',
-    numero_control: '',
-    id_rol: '',
-    id_dependencia: '',
-    email: '',
-    email_confirmation: '',
-    password: '',
-    password_confirmation: '',
+    name: props.usuario?.name || '',
+    primer_apellido: props.usuario?.primer_apellido || '',
+    segundo_apellido: props.usuario?.segundo_apellido || '',
+    numero_control: props.usuario?.numero_control || '',
+    id_rol: props.usuario?.id_rol || '',
+    id_dependencia: props.usuario?.id_dependencia || '',
+    email: props.usuario?.email || '',
+    email_confirmation: props.usuario?.email || '',
 });
 
 const handleSubmit = () => {
-    form.post(route('usuarios.store'), {
-        onSuccess: () => {
-            Swal.fire({
-                icon: 'success',
-                title: 'Usuario creado',
-                text: 'El usuario ha sido creado exitosamente.',
-                timer: 2000,
-                showConfirmButton: false,
-            });
-        },
-        onError: (errors) => {
-            console.error('❌ [FORM] Errores de validación:', errors);
-        },
-    });
+    if (props.isEditing && props.usuario) {
+        // Editar usuario
+        form.put(route('usuarios.update', props.usuario.id), {
+            onSuccess: () => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Usuario actualizado',
+                    text: 'El usuario ha sido actualizado exitosamente.',
+                    timer: 2000,
+                    showConfirmButton: false,
+                });
+            },
+            onError: (errors) => {
+                console.error('❌ [FORM] Errores de validación:', errors);
+            },
+        });
+    } else {
+        // Crear usuario
+        form.post(route('usuarios.store'), {
+            onSuccess: () => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Usuario creado',
+                    text: 'El usuario ha sido creado exitosamente.',
+                    timer: 2000,
+                    showConfirmButton: false,
+                });
+            },
+            onError: (errors) => {
+                console.error('❌ [FORM] Errores de validación:', errors);
+            },
+        });
+    }
 };
 
 const handleCancel = () => {
@@ -84,14 +128,15 @@ const handleCancel = () => {
 </script>
 
 <template>
-    <Head title="Registrar" />
+    <Head :title="pageTitle" />
     <div class="flex flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-        <h1 class="text-brand-gray text-2xl font-bold">Registrar usuario</h1>
+        <h1 class="text-brand-gray text-2xl font-bold">{{ pageTitle }}</h1>
+        <p class="text-sm text-gray-600">{{ pageDescription }}</p>
 
         <form @submit.prevent="handleSubmit" class="flex flex-col gap-6">
             <div class="grid gap-6 md:grid-cols-2">
                 <div class="grid gap-2">
-                    <Label for="name">Nombre(s)</Label>
+                    <Label for="name" required>Nombre(s)</Label>
                     <Input
                         id="name"
                         v-model="form.name"
@@ -107,7 +152,9 @@ const handleCancel = () => {
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="primer_apellido">Primer apellido</Label>
+                    <Label for="primer_apellido" required
+                        >Primer apellido</Label
+                    >
                     <Input
                         id="primer_apellido"
                         v-model="form.primer_apellido"
@@ -144,7 +191,9 @@ const handleCancel = () => {
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="numero_control">Número de control</Label>
+                    <Label for="numero_control" required
+                        >Número de control</Label
+                    >
                     <Input
                         id="numero_control"
                         v-model="form.numero_control"
@@ -162,7 +211,7 @@ const handleCancel = () => {
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="id_rol">Rol del Usuario</Label>
+                    <Label for="id_rol" required>Rol del Usuario</Label>
                     <Select v-model="form.id_rol" :tabindex="5">
                         <SelectTrigger id="id_rol" class="w-full">
                             <SelectValue
@@ -188,7 +237,7 @@ const handleCancel = () => {
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="id_dependencia">Dependencia</Label>
+                    <Label for="id_dependencia" required>Dependencia</Label>
                     <Select v-model="form.id_dependencia" :tabindex="6">
                         <SelectTrigger id="id_dependencia" class="w-full">
                             <SelectValue
@@ -219,7 +268,7 @@ const handleCancel = () => {
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="email">Correo electrónico</Label>
+                    <Label for="email" required>Correo electrónico</Label>
                     <Input
                         id="email"
                         v-model="form.email"
@@ -234,7 +283,7 @@ const handleCancel = () => {
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="email_confirmation"
+                    <Label for="email_confirmation" required
                         >Confirmar correo electrónico</Label
                     >
                     <Input
@@ -249,36 +298,6 @@ const handleCancel = () => {
                         {{ form.errors.email }}
                     </p>
                 </div>
-
-                <div class="grid gap-2">
-                    <Label for="password">Contraseña</Label>
-                    <PasswordInput
-                        id="password"
-                        v-model="form.password"
-                        :tabindex="9"
-                        autocomplete="new-password"
-                        placeholder="Contraseña"
-                    />
-                    <p v-if="form.errors.password" class="text-sm text-red-600">
-                        {{ form.errors.password }}
-                    </p>
-                </div>
-
-                <div class="grid gap-2">
-                    <Label for="password_confirmation"
-                        >Confirmar contraseña</Label
-                    >
-                    <PasswordInput
-                        id="password_confirmation"
-                        v-model="form.password_confirmation"
-                        :tabindex="10"
-                        autocomplete="new-password"
-                        placeholder="Confirmar contraseña"
-                    />
-                    <p v-if="form.errors.password" class="text-sm text-red-600">
-                        {{ form.errors.password }}
-                    </p>
-                </div>
             </div>
 
             <div class="flex items-center gap-4">
@@ -289,7 +308,11 @@ const handleCancel = () => {
                     :disabled="form.processing"
                 >
                     <Spinner v-if="form.processing" class="mr-2 h-4 w-4" />
-                    Agregar usuario
+                    {{
+                        props.isEditing
+                            ? 'Actualizar usuario'
+                            : 'Agregar usuario'
+                    }}
                 </Button>
 
                 <Button

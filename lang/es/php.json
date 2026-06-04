@@ -134,7 +134,7 @@
     "size.numeric": "El tamaño de :attribute debe ser :size.",
     "size.string": "El campo :attribute debe contener :size caracteres.",
     "starts_with": "El campo :attribute debe comenzar con uno de los siguientes valores: :values",
-    "string": "El campo :attribute debe ser una cadena de caracteres.",
+    "string": "El campo :attribute debe ser texto.",
     "throttle": "Demasiados intentos de acceso. Por favor intente nuevamente en :seconds segundos.",
     "throttled": "Por favor espere antes de intentar de nuevo.",
     "timezone": "El campo :attribute debe ser una zona horaria válida.",

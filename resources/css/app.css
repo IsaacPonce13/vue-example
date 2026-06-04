@@ -4,6 +4,29 @@
 
 @import 'datatables.net-dt';
 
+/* DataTable alignment styles */
+@layer utilities {
+    /* Alinear todas las celdas del datatable a la izquierda */
+    .dataTables_wrapper table td,
+    .dataTables_wrapper table th {
+        text-align: left !important;
+    }
+
+    /* Asegurar que dt-left alinee a la izquierda */
+    .dt-left {
+        text-align: left !important;
+    }
+
+    /* Asegurar que dt-center y dt-right no se apliquen */
+    .dt-center {
+        text-align: left !important;
+    }
+
+    .dt-right {
+        text-align: left !important;
+    }
+}
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
@@ -113,7 +136,7 @@
     /* Estados Muted (Apagados) */
     --muted: hsl(213 6% 96%);
     --muted-foreground: hsl(213 6% 45%);
-    
+
     /* ACENTO DE LA PALETA (Dorado) */
     --accent: hsl(36 36% 55%);
     --accent-foreground: hsl(0 0% 100%);
