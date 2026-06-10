@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ModuloController;
 use App\Http\Controllers\UsuariosController;
+use App\Http\Controllers\RolesController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -38,9 +39,38 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/usuarios/{id}', [UsuariosController::class, 'update'])->name('usuarios.update');
     Route::put('/usuarios/{id}/password', [UsuariosController::class, 'password'])->name('usuarios.password');
     Route::put('/usuarios/{id}/estado', [UsuariosController::class, 'estado'])->name('usuarios.estado');
+
+    // ==========================================
+    // RUTAS DE ROLES
+    // ==========================================
+    // 1. Visualización (Páginas de Vue)
+    Route::get('/roles', [RolesController::class, 'index'])->name('roles');
+    Route::get('/roles/crear', [RolesController::class, 'create'])->name('roles.create');
+    Route::get('/roles/{id}/ver', [RolesController::class, 'show'])->name('roles.show');
+    Route::get('/roles/{id}/editar', [RolesController::class, 'edit'])->name('roles.edit');
+    // 2. Acciones (Procesamiento de datos tras enviar formularios)
+    Route::post('/roles', [RolesController::class, 'store'])->name('roles.store');
+    Route::put('/roles/{id}', [RolesController::class, 'update'])->name('roles.update');
+    Route::put('/roles/{id}/password', [RolesController::class, 'password'])->name('roles.password');
+    Route::put('/roles/{id}/estado', [RolesController::class, 'estado'])->name('roles.estado');
+
+    // ==========================================
+    // RUTAS DE PERMISOS
+    // ==========================================
+    // 1. Visualización (Páginas de Vue)
+    Route::get('/permisos', [PermisosController::class, 'index'])->name('permisos');
+    Route::get('/permisos/crear', [PermisosController::class, 'create'])->name('permisos.create');
+    Route::get('/permisos/{id}/ver', [PermisosController::class, 'show'])->name('permisos.show');
+    Route::get('/permisos/{id}/editar', [PermisosController::class, 'edit'])->name('permisos.edit');
+    // 2. Acciones (Procesamiento de datos tras enviar formularios)
+    Route::post('/permisos', [PermisosController::class, 'store'])->name('permisos.store');
+    Route::put('/permisos/{id}', [PermisosController::class, 'update'])->name('permisos.update');
+    Route::put('/permisos/{id}/password', [PermisosController::class, 'password'])->name('permisos.password');
+    Route::put('/permisos/{id}/estado', [PermisosController::class, 'estado'])->name('permisos.estado');
+
 });
 
-Route::middleware('auth')->group(function () {
+    Route::middleware('auth')->group(function () {
     Route::inertia('profile', 'Profile')->name('profile');
 });
 

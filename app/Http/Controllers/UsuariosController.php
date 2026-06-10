@@ -27,20 +27,20 @@ class UsuariosController extends Controller
     }
 
 
-public function generateSecurePassword($length = 16)
-{
-    $password = Str::random($length);
-    
-    $uppercase = Str::upper(Str::random(1));
-    $lowercase = Str::lower(Str::random(1));
-    $number = rand(0, 9);
-    $special = substr(str_shuffle('!@#$%^&*()_+-=[]{}|;:,.<>?'), 0, 1);
-    
-    // Combinar y mezclar
-    $password = $password . $uppercase . $lowercase . $number . $special;
-    
-    return str_shuffle($password);
-}
+    public function generateSecurePassword($length = 16)
+    {
+        $password = Str::random($length);
+        
+        $uppercase = Str::upper(Str::random(1));
+        $lowercase = Str::lower(Str::random(1));
+        $number = rand(0, 9);
+        $special = substr(str_shuffle('!@#$%^&*()_+-=[]{}|;:,.<>?'), 0, 1);
+        
+        // Combinar y mezclar
+        $password = $password . $uppercase . $lowercase . $number . $special;
+        
+        return str_shuffle($password);
+    }
 
     public function store(Request $request): RedirectResponse
     {

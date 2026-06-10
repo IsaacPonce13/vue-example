@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { House, LayoutGrid, Users } from 'lucide-vue-next';
+import {
+    House,
+    LayoutGrid,
+    Users,
+    KeyRound,
+    LockKeyhole,
+} from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -32,7 +38,17 @@ const mainNavItems: NavItem[] = [
         title: 'Usuarios',
         href: '/usuarios',
         icon: Users,
-    }
+    },
+    {
+        title: 'Roles y permisos',
+        href: '/roles',
+        icon: KeyRound,
+    },
+    {
+        title: 'Permisos',
+        href: '/permisos',
+        icon: LockKeyhole,
+    },
 ];
 
 const footerNavItems: NavItem[] = [
@@ -41,7 +57,6 @@ const footerNavItems: NavItem[] = [
     //     href: 'https://github.com/laravel/vue-starter-kit',
     //     icon: FolderGit2,
     // },
-
     // {
     //     title: 'Documentation',
     //     href: 'https://laravel.com/docs/starter-kits#vue',
