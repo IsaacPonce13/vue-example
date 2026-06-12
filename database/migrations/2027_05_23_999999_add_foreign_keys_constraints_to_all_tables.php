@@ -13,7 +13,7 @@ return new class extends Migration
     {
         // Relaciones de la tabla USERS
         Schema::table('users', function (Blueprint $table) {
-            $table->foreign('id_rol')->references('id')->on('ca_roles');
+            $table->foreign('id_rol')->references('id')->on('roles');
             $table->foreign('id_dependencia')->references('id')->on('ca_dependencias');
         });
 
@@ -47,6 +47,11 @@ return new class extends Migration
         Schema::table('ma_portales', function (Blueprint $table) {
             $table->foreign('id_tipo_portal')->references('id')->on('ca_tipo_portal');
             $table->foreign('id_dependencia')->references('id')->on('ca_dependencias');
+        });
+        // Relaciones de la tabla re_rutas_rol
+        Schema::table('re_rutas_rol', function (Blueprint $table) {
+            $table->foreign('perfil_id')->references('id')->on('roles');
+            $table->foreign('ruta_frontend_id')->references('id')->on('ca_rutas');
         });
     }
 
@@ -92,5 +97,10 @@ return new class extends Migration
             $table->dropForeign(['id_rol']);
             $table->dropForeign(['id_dependencia']);
         });
-    }
+
+        // Deshacemos las relaciones de la tabla roles_rutas
+        Schema::table('re_rutas_rol', function (Blueprint $table) {
+            $table->dropForeign(['perfil_id']);
+            $table->dropForeign(['ruta_frontend_id']);
+        });    }
 };
