@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import {
     House,
     LayoutGrid,
@@ -23,6 +24,9 @@ import {
 import { dashboard, modulos } from '@/routes';
 import type { NavItem } from '@/types';
 
+const page = usePage();
+const auth = computed(() => page.props.auth || {});
+
 const mainNavItems: NavItem[] = [
     {
         title: 'Inicio',
@@ -33,21 +37,25 @@ const mainNavItems: NavItem[] = [
         title: 'Modulos',
         href: modulos(),
         icon: LayoutGrid,
+        permission: 'modulos',
     },
     {
         title: 'Usuarios',
         href: '/usuarios',
         icon: Users,
+        permission: 'usuarios',
     },
     {
         title: 'Roles y permisos',
         href: '/roles',
         icon: KeyRound,
+        permission: 'roles',
     },
     {
         title: 'Permisos',
         href: '/permisos',
         icon: LockKeyhole,
+        permission: 'permisos',
     },
 ];
 
@@ -63,6 +71,16 @@ const footerNavItems: NavItem[] = [
     //     icon: BookOpen,
     // },
 ];
+
+const visibleMainNavItems = computed(() => {
+    const permissions = Array.isArray(auth.value.permissions)
+        ? auth.value.permissions
+        : [];
+
+    return mainNavItems.filter(
+        (item) => !item.permission || permissions.includes(item.permission),
+    );
+});
 </script>
 
 <template>
@@ -80,7 +98,7 @@ const footerNavItems: NavItem[] = [
         </SidebarHeader>
 
         <SidebarContent>
-            <NavMain :items="mainNavItems" />
+            <NavMain :items="visibleMainNavItems" />
         </SidebarContent>
 
         <SidebarFooter>
