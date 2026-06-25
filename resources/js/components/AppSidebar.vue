@@ -22,6 +22,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard, modulos } from '@/routes';
+import usuarios from '@/routes/admin';
 import type { NavItem } from '@/types';
 
 const page = usePage();
@@ -37,25 +38,21 @@ const mainNavItems: NavItem[] = [
         title: 'Modulos',
         href: modulos(),
         icon: LayoutGrid,
-        permission: 'modulos',
     },
     {
         title: 'Usuarios',
-        href: '/usuarios',
+        href: '/admin/usuarios',
         icon: Users,
-        permission: 'usuarios',
     },
     {
         title: 'Roles y permisos',
-        href: '/roles',
+        href: '/admin/roles',
         icon: KeyRound,
-        permission: 'roles',
     },
     {
         title: 'Permisos',
-        href: '/permisos',
+        href: 'permisos',
         icon: LockKeyhole,
-        permission: 'permisos',
     },
 ];
 

@@ -1,14 +1,16 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Inertia\Inertia;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Str;
 
 
 
@@ -16,14 +18,18 @@ class UsuariosController extends Controller
 {
     public function index()
     {
-        $users = User::all();
+        $users = User::with('roles')->get();
 
         return Inertia::render('usuarios/index', compact('users'));
     }
 
     public function create()
     {
-        return Inertia::render('usuarios/form');
+        $roles = Role::select('id', 'name')->orderBy('name')->get();
+
+        return Inertia::render('usuarios/form', [
+            'roles' => $roles,
+        ]);
     }
 
 
@@ -53,7 +59,8 @@ class UsuariosController extends Controller
             'name' => 'required|string|max:255',
             'primer_apellido' => 'required|string|max:255',
             'segundo_apellido' => 'string|max:255|nullable',
-            'numero_control' => 'required|numeric|digits_between:13,15|unique:users,numero_control',            'id_rol' => 'required|integer|exists:ca_roles,id',
+            'numero_control' => 'required|numeric|digits_between:13,15|unique:users,numero_control',
+            'id_rol' => 'required|integer|exists:roles,id',
             'id_dependencia' => 'required|integer|exists:ca_dependencias,id',
             'email' => 'required|string|email|max:255|unique:users|confirmed',
             'password' => 'required|string|min:8',
@@ -71,8 +78,10 @@ class UsuariosController extends Controller
 
         try {
             $user = User::create($data);
+            $role = Role::findOrFail($data['id_rol']);
+            $user->syncRoles([$role]);
 
-            return redirect()->route('usuarios')
+            return redirect('/admin/usuarios')
                 ->with('success', 'Usuario creado exitosamente.');
         } catch (\Exception $e) {
             return back()
@@ -83,11 +92,13 @@ class UsuariosController extends Controller
 
     public function edit($id)
     {
-        $usuario = User::findOrFail($id);
+        $usuario = User::with('roles')->findOrFail($id);
+        $roles = Role::select('id', 'name')->orderBy('name')->get();
 
         return Inertia::render('usuarios/form', [
             'usuario' => $usuario,
             'isEditing' => true,
+            'roles' => $roles,
         ]);
     }
 
@@ -100,7 +111,7 @@ class UsuariosController extends Controller
             'primer_apellido' => 'required|string|max:255',
             'segundo_apellido' => 'string|max:255|nullable',
             'numero_control' => "required|numeric|digits_between:13,15|unique:users,numero_control,$id",
-            'id_rol' => 'required|integer|exists:ca_roles,id',
+            'id_rol' => 'required|integer|exists:roles,id',
             'id_dependencia' => 'required|integer|exists:ca_dependencias,id',
             'email' => "required|string|email|max:255|unique:users,email,$id|confirmed",
         ], [], [
@@ -116,8 +127,10 @@ class UsuariosController extends Controller
         
         try {
             $usuario->update($data);
+            $role = Role::findOrFail($data['id_rol']);
+            $usuario->syncRoles([$role]);
 
-            return redirect()->route('usuarios')
+            return redirect('/admin/usuarios')
                 ->with('success', 'Usuario actualizado exitosamente.');
         } catch (\Exception $e) {
             return back()

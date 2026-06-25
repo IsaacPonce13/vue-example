@@ -12,16 +12,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            roles::class,               
-            // TipoDependenciaSeeder::class,
-        ]);
-
-        $this->call([
-            dependencias::class,      
-        ]);
-
-        $this->call([
-            users::class,        
+            DependenciasSeeder::class,
+            // HasPermissionsSeeder::class,
+            RoleSeeder::class,
+            users::class,
         ]);
     }
 }

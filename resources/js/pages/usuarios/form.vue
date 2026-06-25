@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { Head, useForm, router, usePage } from '@inertiajs/vue3';
-import { onMounted, watch, computed } from 'vue';
+import { Head, useForm, router } from '@inertiajs/vue3';
+import { watch, computed } from 'vue';
 import Swal from 'sweetalert2';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { usuarios } from '@/routes';
+import usuarios from '@/routes/admin/usuarios';
 import { route } from 'ziggy-js';
 
 import {
@@ -20,24 +20,32 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 
+interface RoleOption {
+    id: number;
+    name: string;
+}
+
 interface Usuario {
     id: number;
     name: string;
     primer_apellido: string;
     segundo_apellido?: string | null;
     numero_control: string;
-    id_rol: number;
+    id_rol?: number;
     id_dependencia: number;
     email: string;
+    roles?: RoleOption[];
 }
 
 interface Props {
     usuario?: Usuario;
     isEditing?: boolean;
+    roles: RoleOption[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
     isEditing: false,
+    roles: [],
 });
 
 // Títulos dinámicos
@@ -51,23 +59,17 @@ const pageDescription = computed(() =>
         : 'Ingresa los datos para crear un nuevo usuario en el sistema.',
 );
 
-defineOptions({
-    layout: {
-        title: 'Usuarios',
-        breadcrumbs: [
-            {
-                title: 'Usuarios',
-                href: usuarios().url,
-            },
-        ],
-    },
-});
-
-const rolesSource = [
-    { id_rol: 1, value: 1, label: 'Administrador' },
-    { id_rol: 2, value: 2, label: 'Usuario' },
-    { id_rol: 3, value: 3, label: 'Invitado' },
-];
+// defineOptions({
+//     layout: {
+//         title: 'Usuarios',
+//         breadcrumbs: [
+//             {
+//                 title: 'Usuarios',
+//                 href: adminRoutes.usuarios().url,
+//             },
+//         ],
+//     },
+// });
 
 const dependenciasSource = [
     { id_dependencia: 1, value: 1, label: 'Departamento TI' },
@@ -75,12 +77,14 @@ const dependenciasSource = [
     { id_dependencia: 3, value: 3, label: 'Finanzas' },
 ];
 
+const rolesSource = computed(() => props.roles || []);
+
 const form = useForm({
     name: props.usuario?.name || '',
     primer_apellido: props.usuario?.primer_apellido || '',
     segundo_apellido: props.usuario?.segundo_apellido || '',
     numero_control: props.usuario?.numero_control || '',
-    id_rol: props.usuario?.id_rol || '',
+    id_rol: props.usuario?.roles?.[0]?.id || props.usuario?.id_rol || '',
     id_dependencia: props.usuario?.id_dependencia || '',
     email: props.usuario?.email || '',
     email_confirmation: props.usuario?.email || '',
@@ -88,8 +92,9 @@ const form = useForm({
 
 const handleSubmit = () => {
     if (props.isEditing && props.usuario) {
-        // Editar usuario
-        form.put(route('usuarios.update', props.usuario.id), {
+        // En lugar de route('usuarios.update', id), usas tu importación:
+        form.put(usuarios.update(props.usuario.id).url, {
+            // <--- .url es la clave
             onSuccess: () => {
                 Swal.fire({
                     icon: 'success',
@@ -104,8 +109,9 @@ const handleSubmit = () => {
             },
         });
     } else {
-        // Crear usuario
-        form.post(route('usuarios.store'), {
+        // Para crear un nuevo usuario:
+        form.post(usuarios.store().url, {
+            // <--- .url
             onSuccess: () => {
                 Swal.fire({
                     icon: 'success',
@@ -123,7 +129,8 @@ const handleSubmit = () => {
 };
 
 const handleCancel = () => {
-    router.visit(route('usuarios'));
+    // Para regresar a la tabla principal de usuarios sin usar Ziggy:
+    router.visit(usuarios.index().url); // <--- .url
 };
 </script>
 
@@ -223,10 +230,10 @@ const handleCancel = () => {
                                 <SelectLabel>Roles del usuario</SelectLabel>
                                 <SelectItem
                                     v-for="item in rolesSource"
-                                    :key="item.value"
-                                    :value="item.value"
+                                    :key="item.id"
+                                    :value="item.id"
                                 >
-                                    {{ item.label }}
+                                    {{ item.name }}
                                 </SelectItem>
                             </SelectGroup>
                         </SelectContent>

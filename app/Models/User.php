@@ -39,7 +39,6 @@ class User extends Authenticatable
         'primer_apellido',
         'segundo_apellido',
         'numero_control',
-        'id_rol',
         'id_dependencia',
         'email',
         'password',

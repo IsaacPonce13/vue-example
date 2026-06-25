@@ -1,51 +1,49 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import { roles } from '@/routes';
-import rolesRoutes from '@/routes/roles';
 import { router } from '@inertiajs/vue3';
 
-// Importación normal de los iconos en PascalCase
+// Iconos
 import { SquarePen, ToggleRight, ToggleLeft } from 'lucide-vue-next';
 
-import modalRol from '@/components/roles/modalRol.vue';
+// Componente del Modal renombrado limpiamente en PascalCase
+import RolesModal from '@/components/roles/modalRol.vue';
 import Swal from 'sweetalert2';
 import { DataTable } from 'datatables.net-vue3';
 
-defineOptions({
-    layout: {
-        breadcrumbs: [
-            {
-                title: 'roles',
-                href: roles().url,
-            },
-        ],
-    },
-});
-
-interface rol {
+// CORREGIDO: Interfaz en singular y PascalCase
+interface Role {
     id: number;
     name: string;
-    active?: boolean;
+    active?: number; // El controlador maneja 0 o 1
+    permissions?: any[];
 }
 
+interface Permiso {
+    id: number;
+    name: string;
+}
+
+// CORREGIDO: Recibir los roles y la lista global de permisos desde el controlador
 interface Props {
-    rol: rol[];
+    roles: Role[];
+    permisos: Permiso[];
 }
 
 const props = defineProps<Props>();
-const rol = props.rol || [];
 
 const isModalOpen = ref(false);
-const selectedRol = ref<rol | null>(null);
+const selectedRol = ref<Role | null>(null);
 
-const openModal = (rol: rol) => {
-    selectedRol.value = rol;
+// CORREGIDO: Para crear un rol nuevo, pasamos null (el modal sabrá que es una creación)
+const openCreateModal = () => {
+    selectedRol.value = null;
     isModalOpen.value = true;
 };
 
-const openEditModal = (rol: rol) => {
-    selectedRol.value = rol;
+// CORREGIDO: Para editar, pasamos el objeto del rol seleccionado
+const openEditModal = (roleData: Role) => {
+    selectedRol.value = roleData;
     isModalOpen.value = true;
 };
 
@@ -71,7 +69,7 @@ const cambiarEstado = (id: number, active: number) => {
                 { active },
                 {
                     preserveScroll: true,
-                    preserveState: false, // Recarga los datos
+                    preserveState: false,
                     onSuccess: () => {
                         Swal.fire(
                             '¡Hecho!',
@@ -86,16 +84,8 @@ const cambiarEstado = (id: number, active: number) => {
 };
 
 const columns = [
-    {
-        title: 'Id',
-        data: 'id',
-        className: 'dt-left',
-    },
-    {
-        title: 'Descripción',
-        data: 'name',
-        className: 'dt-left',
-    },
+    { title: 'Id', data: 'id', className: 'dt-left' },
+    { title: 'Descripción', data: 'name', className: 'dt-left' },
     {
         title: 'Acciones',
         data: null,
@@ -121,8 +111,9 @@ const options = {
     },
 };
 </script>
+
 <template>
-    <Head title="Dashboard" />
+    <Head title="Roles y Permisos" />
 
     <div
         class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
@@ -130,8 +121,8 @@ const options = {
         <div class="mb-2 flex items-center justify-between gap-4">
             <h1 class="text-brand-gray text-2xl font-bold">Roles</h1>
             <button
-                @click="openModal({ id: 0, name: '' })"
-                as="button"
+                @click="openCreateModal"
+                type="button"
                 id="btnNuevo"
                 class="ml-auto cursor-pointer rounded-lg bg-primary px-4 py-2 text-white transition-colors duration-300 hover:bg-secondary"
             >
@@ -141,12 +132,12 @@ const options = {
 
         <div class="rounded-lg bg-white p-6 shadow-xl">
             <DataTable
-                :data="rol"
+                :data="props.roles"
                 :columns="columns"
                 :options="options"
                 class="w-full"
             >
-                <template #column-2="{ cellData, rowData }">
+                <template #column-2="{ rowData }">
                     <div class="flex items-center gap-3">
                         <button
                             type="button"
@@ -171,6 +162,7 @@ const options = {
 
                         <button
                             @click.prevent="openEditModal(rowData)"
+                            type="button"
                             class="cursor-pointer text-yellow-600 transition-colors hover:text-yellow-800"
                             title="Editar rol"
                         >
@@ -180,10 +172,11 @@ const options = {
                 </template>
             </DataTable>
         </div>
-        <modalRol
+
+        <RolesModal
             :is-open="isModalOpen"
             :Rol="selectedRol"
-            :Permisos="[]"
+            :Permisos="props.permisos"
             @close="closeModal"
         />
     </div>

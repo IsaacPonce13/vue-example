@@ -10,7 +10,7 @@ defineOptions({
             {
                 title: 'Modulos',
                 // Agregamos .url porque modulos() devuelve un objeto, no un string
-                href: modulos().url, 
+                href: modulos().url,
             },
         ],
     },
@@ -35,19 +35,27 @@ const options = { responsive: true };
 <template>
     <Head title="Dashboard" />
 
-    <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+    <div
+        class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
+    >
         <div class="grid auto-rows-min gap-4 md:grid-cols-3">
             <h1>Modulos</h1>
-            <Link 
-                :href="modulosRoutes.create().url" 
-                as="button" 
+            <Link
+                :href="modulosRoutes.create().url"
+                as="button"
                 id="btnNuevo"
-                class="ml-auto rounded-lg bg-primary px-4 py-2 text-white hover:bg-secondary cursor-pointer transition-colors duration-300">
+                class="ml-auto cursor-pointer rounded-lg bg-primary px-4 py-2 text-white transition-colors duration-300 hover:bg-secondary"
+            >
                 Nuevo módulo
             </Link>
         </div>
-        <div class="bg-white p-6 shadow-xl rounded-lg">
-            <DataTable :data="modulo" :columns="columns" :options="options" class="w-full" />
+        <div class="rounded-lg bg-white p-6 shadow-xl">
+            <DataTable
+                :data="modulo"
+                :columns="columns"
+                :options="options"
+                class="w-full"
+            />
         </div>
     </div>
 </template>

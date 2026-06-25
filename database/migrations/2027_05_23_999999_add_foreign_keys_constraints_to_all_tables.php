@@ -13,7 +13,6 @@ return new class extends Migration
     {
         // Relaciones de la tabla USERS
         Schema::table('users', function (Blueprint $table) {
-            $table->foreign('id_rol')->references('id')->on('roles');
             $table->foreign('id_dependencia')->references('id')->on('ca_dependencias');
         });
 
@@ -94,7 +93,6 @@ return new class extends Migration
 
         // Deshacemos las relaciones de la tabla USERS
         Schema::table('users', function (Blueprint $table) {
-            $table->dropForeign(['id_rol']);
             $table->dropForeign(['id_dependencia']);
         });
 

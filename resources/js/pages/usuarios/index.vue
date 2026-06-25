@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import { usuarios } from '@/routes';
-import usuariosRoutes from '@/routes/usuarios';
+import usuariosRoutes from '@/routes/admin/usuarios';
 import { router } from '@inertiajs/vue3';
 
 // Importación normal de los iconos en PascalCase
@@ -17,17 +16,6 @@ import {
 import ModalPassword from '@/components/usuarios/modalPassword.vue';
 import Swal from 'sweetalert2';
 import { DataTable } from 'datatables.net-vue3';
-
-defineOptions({
-    layout: {
-        breadcrumbs: [
-            {
-                title: 'usuarios',
-                href: usuarios().url,
-            },
-        ],
-    },
-});
 
 interface users {
     id: number;
@@ -73,7 +61,7 @@ const cambiarEstado = (id: number, active: number) => {
     }).then((result) => {
         if (result.isConfirmed) {
             router.put(
-                `/usuarios/${id}/estado`,
+                `/admin/usuarios/${id}/estado`,
                 { active },
                 {
                     preserveScroll: true,
@@ -112,8 +100,11 @@ const columns = [
     },
     {
         title: 'Rol',
-        data: 'id_rol',
+        data: null,
         className: 'dt-left',
+        render: (usuario: any) => {
+            return usuario.roles?.[0]?.name || `#${usuario.id_rol}`;
+        },
     },
     {
         title: 'Dependencia',
@@ -194,7 +185,7 @@ const options = {
                         </button>
 
                         <Link
-                            :href="`/usuarios/${rowData.id}/editar`"
+                            :href="`/admin/usuarios/${rowData.id}/editar`"
                             class="text-yellow-600 transition-colors hover:text-yellow-800"
                             title="Editar usuario"
                         >
