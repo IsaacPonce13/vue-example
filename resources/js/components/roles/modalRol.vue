@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Spinner } from '@/components/ui/spinner';
 import Swal from 'sweetalert2';
 
-interface Permiso {
+interface Permission {
     id: number;
     name: string;
 }
@@ -16,13 +16,13 @@ interface Permiso {
 interface Rol {
     id: number;
     name: string;
-    permissions?: Permiso[];
+    permissions?: Permission[];
 }
 
 interface Props {
     isOpen: boolean;
-    Rol?: Rol | null;
-    Permisos: Permiso[];
+    rol?: Rol | null;
+    permissions?: Permission[];
 }
 
 interface Emits {
@@ -33,26 +33,25 @@ interface Emits {
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
-const roles = ref('');
+const nombreRol = ref('');
 const permisosSeleccionados = ref<number[]>([]);
 const isLoading = ref(false);
 const selectAll = ref(false);
-
-console.log('permisos: ', permisosSeleccionados);
-console.log('roles: ', roles);
+const checkboxKey = ref(0); // Para forzar re-renderización
 
 // Actualizar estado de "Seleccionar todos"
 const updateSelectAllState = () => {
-    const list = props.Permisos || [];
+    const list = props.permissions || [];
     selectAll.value =
         list.length > 0 && permisosSeleccionados.value.length === list.length;
 };
 
-// Manejar selección individual de permiso
-const togglePermiso = (permisoId: number) => {
-    const index = permisosSeleccionados.value.indexOf(permisoId);
+// Manejar selección individual de Permission
+const togglePermiso = (permisoId: number | string) => {
+    const id = Number(permisoId); // <-- Conversión explícita
+    const index = permisosSeleccionados.value.indexOf(id);
     if (index === -1) {
-        permisosSeleccionados.value.push(permisoId);
+        permisosSeleccionados.value.push(id);
     } else {
         permisosSeleccionados.value.splice(index, 1);
     }
@@ -62,7 +61,7 @@ const togglePermiso = (permisoId: number) => {
 // Manejar seleccionar/deseleccionar todos
 const toggleAllPermissions = (checked: boolean) => {
     selectAll.value = checked;
-    const list = props.Permisos || []; // CORREGIDO
+    const list = props.permissions || [];
     if (checked) {
         permisosSeleccionados.value = list.map((p) => p.id);
     } else {
@@ -70,20 +69,61 @@ const toggleAllPermissions = (checked: boolean) => {
     }
 };
 
+// Vigilante para cuando se abre en modo Edición
 watch(
-    () => props.Rol,
+    () => props.rol,
     (newRol) => {
-        if (newRol) {
-            roles.value = newRol.name || '';
-            if (newRol.permissions && Array.isArray(newRol.permissions)) {
-                permisosSeleccionados.value = newRol.permissions.map(
-                    (p) => p.id,
+        console.log('Watch triggered - newRol:', newRol);
+
+        if (newRol && newRol.id && newRol.id > 0) {
+            nombreRol.value = newRol.name || '';
+
+            // Debug: log los datos disponibles
+            console.log('📋 Checking permissions in newRol:');
+            console.log('   - newRol.permissions:', newRol.permissions);
+            console.log('   - newRol.Permission:', (newRol as any).Permission);
+
+            const rPermisos = Array.isArray(newRol.permissions)
+                ? newRol.permissions
+                : Array.isArray((newRol as any).Permission)
+                  ? (newRol as any).Permission
+                  : [];
+
+            console.log('Final permisos array:', rPermisos);
+
+            if (rPermisos.length > 0) {
+                const permisoIds = rPermisos.map((p: any) => Number(p.id));
+                console.log('Setting permisosSeleccionados to:', permisoIds);
+                permisosSeleccionados.value = permisoIds;
+
+                console.log('IDs asignados (rol):', permisoIds);
+                console.log(
+                    'IDs disponibles (catálogo completo):',
+                    (props.permissions || []).map((p) => p.id),
                 );
+                console.log(
+                    '¿Coinciden?',
+                    permisoIds.every((id) =>
+                        (props.permissions || []).some(
+                            (p) => Number(p.id) === id,
+                        ),
+                    ),
+                );
+                // Forzar re-renderización de checkboxes
+                nextTick(() => {
+                    checkboxKey.value++;
+                    console.log(
+                        '🔄 Checkboxes re-rendered, key is now:',
+                        checkboxKey.value,
+                    );
+                });
             } else {
+                console.log('⚠️ No permissions found, clearing array');
                 permisosSeleccionados.value = [];
             }
         } else {
-            roles.value = '';
+            console.log('🔄 Creating new rol, clearing data');
+            nombreRol.value = '';
             permisosSeleccionados.value = [];
         }
         updateSelectAllState();
@@ -91,23 +131,24 @@ watch(
     { immediate: true },
 );
 
+// Agrupar permisos por su prefijo (ej: "usuarios.editar" -> "usuarios")
 const permisosAgrupados = computed(() => {
-    const grupos: { [key: string]: Permiso[] } = {};
-    const list = props.Permisos || [];
+    const grupos: { [key: string]: Permission[] } = {};
+    const list = props.permissions || [];
 
-    list.forEach((permiso) => {
-        const partes = permiso.name.split('.');
+    list.forEach((p) => {
+        const partes = p.name.split('.');
         const grupo = partes[0] || 'otros';
         if (!grupos[grupo]) {
             grupos[grupo] = [];
         }
-        grupos[grupo].push(permiso);
+        grupos[grupo].push(p);
     });
     return grupos;
 });
 
 const handleSubmit = async () => {
-    if (!roles.value.trim()) {
+    if (!nombreRol.value.trim()) {
         Swal.fire({
             icon: 'warning',
             title: 'Atención',
@@ -116,24 +157,17 @@ const handleSubmit = async () => {
         return;
     }
 
-    // if (permisosSeleccionados.value.length === 0) {
-    //     Swal.fire({
-    //         icon: 'warning',
-    //         title: 'Atención',
-    //         text: 'Debe seleccionar al menos un permiso',
-    //     });
-    //     return;
-    // }
-
     isLoading.value = true;
-    const isEditing = !!(props.Rol && props.Rol.id && props.Rol.id > 0);
+    const isEditing = !!(props.rol && props.rol.id && props.rol.id > 0);
     const method = isEditing ? 'put' : 'post';
-    const endpoint = isEditing ? `/roles/${props.Rol!.id}` : `/roles`;
+    const endpoint = isEditing
+        ? `/admin/roles/${props.rol!.id}`
+        : `/admin/roles`;
 
     router[method](
         endpoint,
         {
-            name: roles.value,
+            name: nombreRol.value,
             permisos: permisosSeleccionados.value,
         },
         {
@@ -167,7 +201,7 @@ const handleSubmit = async () => {
 };
 
 const closeModal = () => {
-    roles.value = '';
+    nombreRol.value = '';
     permisosSeleccionados.value = [];
     selectAll.value = false;
     emit('close');
@@ -184,7 +218,7 @@ const closeModal = () => {
         >
             <div class="flex items-center justify-between border-b pb-4">
                 <h3 class="text-lg font-semibold text-gray-900">
-                    {{ props.Rol ? 'Editar rol' : 'Crear rol' }}
+                    {{ props.rol ? 'Editar rol' : 'Crear rol' }}
                 </h3>
                 <Button
                     type="button"
@@ -219,7 +253,7 @@ const closeModal = () => {
                     </Label>
                     <Input
                         id="rol"
-                        v-model="roles"
+                        v-model="nombreRol"
                         type="text"
                         placeholder="Ej: Administrador, Editor, Usuario..."
                         class="w-full"
@@ -235,18 +269,17 @@ const closeModal = () => {
                             class="flex cursor-pointer items-center space-x-2"
                         >
                             <Checkbox
-                                :checked="selectAll"
-                                @update:checked="toggleAllPermissions"
+                                :model-value="selectAll"
+                                @update:model-value="toggleAllPermissions"
                             />
                             <span class="text-sm text-gray-600"
                                 >Seleccionar todos</span
                             >
                         </label>
                     </div>
-
                     <div class="space-y-4">
                         <div
-                            v-for="(permisos, grupo) in permisosAgrupados"
+                            v-for="(listaPermisos, grupo) in permisosAgrupados"
                             :key="grupo"
                             class="rounded-lg border border-gray-200 p-4"
                         >
@@ -255,19 +288,23 @@ const closeModal = () => {
                             >
                                 {{ grupo }}
                             </h4>
-                            <div class="grid grid-cols-2 gap-3">
+                            <div
+                                class="grid grid-cols-2 gap-3"
+                                :key="`grupo-${grupo}-${checkboxKey}`"
+                            >
                                 <label
-                                    v-for="permiso in permisos"
-                                    :key="permiso.id"
+                                    v-for="permiso in listaPermisos"
+                                    :key="`permiso-${permiso.id}-${checkboxKey}`"
                                     class="flex cursor-pointer items-center space-x-3 rounded-md p-2 hover:bg-gray-50"
                                 >
+                                    <!-- Checkboxes de permisos individuales -->
                                     <Checkbox
-                                        :checked="
+                                        :model-value="
                                             permisosSeleccionados.includes(
-                                                permiso.id,
+                                                Number(permiso.id),
                                             )
                                         "
-                                        @update:checked="
+                                        @update:model-value="
                                             () => togglePermiso(permiso.id)
                                         "
                                         :id="`permiso-${permiso.id}`"

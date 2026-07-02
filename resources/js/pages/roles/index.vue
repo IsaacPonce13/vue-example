@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 
 // Iconos
@@ -11,40 +11,62 @@ import RolesModal from '@/components/roles/modalRol.vue';
 import Swal from 'sweetalert2';
 import { DataTable } from 'datatables.net-vue3';
 
-// CORREGIDO: Interfaz en singular y PascalCase
 interface Role {
     id: number;
     name: string;
-    active?: number; // El controlador maneja 0 o 1
-    permissions?: any[];
+    active?: number;
+    permissions?: Permission[];
+    Permission?: Permission[];
 }
 
-interface Permiso {
+interface Permission {
     id: number;
     name: string;
 }
 
-// CORREGIDO: Recibir los roles y la lista global de permisos desde el controlador
 interface Props {
+    isOpen?: boolean;
     roles: Role[];
-    permisos: Permiso[];
+    permissions?: Permission[];
+    Permission?: Permission[];
 }
 
 const props = defineProps<Props>();
 
 const isModalOpen = ref(false);
 const selectedRol = ref<Role | null>(null);
+const availablePermissions = computed(() => {
+    if (Array.isArray(props.permissions) && props.permissions.length > 0) {
+        return props.permissions;
+    }
 
-// CORREGIDO: Para crear un rol nuevo, pasamos null (el modal sabrá que es una creación)
+    return Array.isArray((props as any).Permission)
+        ? (props as any).Permission
+        : [];
+});
+
 const openCreateModal = () => {
     selectedRol.value = null;
     isModalOpen.value = true;
 };
 
-// CORREGIDO: Para editar, pasamos el objeto del rol seleccionado
 const openEditModal = (roleData: Role) => {
-    selectedRol.value = roleData;
-    isModalOpen.value = true;
+    // Obtener el rol completo con sus permisos desde el backend
+    fetch(`/admin/roles/${roleData.id}/ver`)
+        .then((response) => response.json())
+        .then((data) => {
+            console.log('📥 Rol obtenido del servidor:', data);
+            selectedRol.value = data;
+            isModalOpen.value = true;
+        })
+        .catch((error) => {
+            console.error('Error al obtener el rol:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al cargar el rol para edición',
+            });
+        });
 };
 
 const closeModal = () => {
@@ -65,7 +87,7 @@ const cambiarEstado = (id: number, active: number) => {
     }).then((result) => {
         if (result.isConfirmed) {
             router.put(
-                `/roles/${id}/estado`,
+                `/admin/roles/${id}/estado`,
                 { active },
                 {
                     preserveScroll: true,
@@ -174,9 +196,10 @@ const options = {
         </div>
 
         <RolesModal
-            :is-open="isModalOpen"
-            :Rol="selectedRol"
-            :Permisos="props.permisos"
+            v-if="isModalOpen"
+            :isOpen="isModalOpen"
+            :rol="selectedRol"
+            :permissions="availablePermissions"
             @close="closeModal"
         />
     </div>

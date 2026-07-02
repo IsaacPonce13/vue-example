@@ -32,13 +32,13 @@ class RoleSeeder extends Seeder
         ]);
 
         // Permisos modulos
-        Permission::create(['name' => 'modulos'])->syncRoles([$role1]);
-        Permission::create(['name' => 'modulos.create'])->syncRoles([$role1]);
-        Permission::create(['name' => 'modulos.show'])->syncRoles([$role1]);
-        Permission::create(['name' => 'modulos.edit'])->syncRoles([$role1]);
-        Permission::create(['name' => 'modulos.store'])->syncRoles([$role1]);
-        Permission::create(['name' => 'modulos.update'])->syncRoles([$role1]);
-        Permission::create(['name' => 'modulos.estado'])->syncRoles([$role1]);
+        Permission::create(['name' => 'modulos'])->syncRoles([$role1, $role2]);
+        Permission::create(['name' => 'modulos.create'])->syncRoles([$role1, $role2]);
+        Permission::create(['name' => 'modulos.show'])->syncRoles([$role1, $role2]);
+        Permission::create(['name' => 'modulos.edit'])->syncRoles([$role1, $role2]);
+        Permission::create(['name' => 'modulos.store'])->syncRoles([$role1, $role2]);
+        Permission::create(['name' => 'modulos.update'])->syncRoles([$role1, $role2]);
+        Permission::create(['name' => 'modulos.estado'])->syncRoles([$role1, $role2]);
 
         // Permisos usuairos
         Permission::create(['name' => 'usuarios'])->syncRoles([$role1]);

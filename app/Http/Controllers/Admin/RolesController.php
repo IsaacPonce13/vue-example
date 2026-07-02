@@ -16,13 +16,16 @@ class RolesController extends Controller
     /**
      * Mostrar lista de roles con sus permisos
      */
-public function index(): \Inertia\Response
-{
-    return Inertia::render('roles/index', [ 
-        'roles' => Role::with('permissions')->get(),
-        'permisos' => Permission::all()
-    ]);
-}
+    public function index(): Response
+    {
+        $roles = Role::with('permissions')->get();
+        $permisos = Permission::all();
+
+        return Inertia::render('roles/index', [
+            'roles' => $roles,
+            'permissions' => $permisos,
+        ]);
+    }
 
     /**
      * Mostrar formulario para crear rol
@@ -32,7 +35,7 @@ public function index(): \Inertia\Response
         $permisos = Permission::all(); 
 
         return Inertia::render('roles/create', [
-            'permisos' => $permisos
+            'permissions' => $permisos,
         ]);
     }
 
@@ -56,9 +59,7 @@ public function index(): \Inertia\Response
         // Si no se envían permisos, sincroniza un array vacío (limpia/no asigna nada)
         $role->syncPermissions($request->input('permisos', []));
 
-        return redirect()
-            ->route('roles')
-            ->with('success', 'Rol creado exitosamente.');
+        return redirect()->route('admin.roles.index')->with('success', 'Rol actualizado correctamente');
     }
 
     /**
@@ -72,7 +73,7 @@ public function index(): \Inertia\Response
         
         return Inertia::render('roles/edit', [
             'rol' => $role,
-            'permisos' => $permisos,
+            'permissions' => $permisos,
         ]);
     }
 
@@ -94,13 +95,9 @@ public function index(): \Inertia\Response
 
         $role->update(['name' => $validated['name']]);
         
-        // Al usar de esta manera, si el usuario desmarca todos los permisos, 
-        // se removerán correctamente de la base de datos.
         $role->syncPermissions($request->input('permisos', []));
 
-        return redirect()
-            ->route('roles')
-            ->with('success', 'Rol actualizado exitosamente.');
+        return redirect()->route('admin.roles.index')->with('success', 'Rol actualizado correctamente');
     }
 
     /**
@@ -130,5 +127,15 @@ public function index(): \Inertia\Response
             return back()
                 ->withErrors(['general' => 'Error al actualizar el estado en el servidor.']);
         }
+    }
+
+    /**
+     * Obtener un rol completo con sus permisos (JSON)
+     * Usado por el modal al editar
+     */
+    public function show($id)
+    {
+        $role = Role::with('permissions')->findOrFail($id);
+        return response()->json($role);
     }
 }

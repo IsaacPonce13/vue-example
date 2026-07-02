@@ -43,6 +43,7 @@ const mainNavItems: NavItem[] = [
         title: 'Usuarios',
         href: '/admin/usuarios',
         icon: Users,
+        // can: usuarios
     },
     {
         title: 'Roles y permisos',
