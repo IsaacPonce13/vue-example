@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import { House, LayoutGrid, Users, KeyRound } from 'lucide-vue-next';
+import {
+    House,
+    LayoutGrid,
+    Users,
+    KeyRound,
+    SquareLibrary,
+} from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -31,24 +37,25 @@ const mainNavItems: NavItem[] = [
         title: 'Modulos',
         href: modulos(),
         icon: LayoutGrid,
-        role: [
-            'Super usuario',
-            'Administrativo dependencia',
-            'Comunicación social',
-        ],
-        // permission: 'modulos',
+        permission: 'modulos',
     },
     {
         title: 'Usuarios',
         href: '/admin/usuarios',
         icon: Users,
-        role: 'Super usuario',
+        permission: 'usuarios',
     },
     {
         title: 'Roles y permisos',
         href: '/admin/roles',
         icon: KeyRound,
-        role: 'Super usuario',
+        permission: 'roles',
+    },
+    {
+        title: 'Catalogos',
+        href: '/admin/catalogos',
+        icon: SquareLibrary,
+        // permission: 'catalogos',
     },
 ];
 
@@ -66,25 +73,11 @@ const footerNavItems: NavItem[] = [
 ];
 
 const visibleMainNavItems = computed(() => {
-    const permissions = Array.isArray(auth.value.permissions)
-        ? auth.value.permissions
-        : [];
-    const roles = Array.isArray(auth.value.roles) ? auth.value.roles : [];
+    const userPermissions = auth.value.permissions;
+    const permissions = Array.isArray(userPermissions) ? userPermissions : [];
 
     return mainNavItems.filter((item) => {
-        if (item.permission && !permissions.includes(item.permission)) {
-            return false;
-        }
-
-        if (!item.role) {
-            return true;
-        }
-
-        const requiredRoles = Array.isArray(item.role)
-            ? item.role
-            : [item.role];
-
-        return requiredRoles.some((role) => roles.includes(role));
+        return !item.permission || permissions.includes(item.permission);
     });
 });
 </script>
