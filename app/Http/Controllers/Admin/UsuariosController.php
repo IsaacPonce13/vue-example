@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Str;
-
+use App\Models\Dependencias;
 
 
 class UsuariosController extends Controller
@@ -26,9 +26,11 @@ class UsuariosController extends Controller
     public function create()
     {
         $roles = Role::select('id', 'name')->orderBy('name')->get();
+        $dependencias = Dependencias::select('id', 'descripcion')->orderBy('descripcion')->get();
 
         return Inertia::render('usuarios/form', [
             'roles' => $roles,
+            'dependencias' => $dependencias,
         ]);
     }
 
@@ -94,11 +96,13 @@ class UsuariosController extends Controller
     {
         $usuario = User::with('roles')->findOrFail($id);
         $roles = Role::select('id', 'name')->orderBy('name')->get();
+        $dependencias = Dependencias::select('id', 'descripcion')->orderBy('descripcion')->get();
 
         return Inertia::render('usuarios/form', [
             'usuario' => $usuario,
             'isEditing' => true,
             'roles' => $roles,
+            'dependencias' => $dependencias,
         ]);
     }
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, useForm, router } from '@inertiajs/vue3';
-import { watch, computed } from 'vue';
+import { computed } from 'vue';
 import Swal from 'sweetalert2';
 
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import usuarios from '@/routes/admin/usuarios';
-import { route } from 'ziggy-js';
 
 import {
     Select,
@@ -37,15 +36,22 @@ interface Usuario {
     roles?: RoleOption[];
 }
 
+interface DependenciaOption {
+    id: number;
+    descripcion: string;
+}
+
 interface Props {
     usuario?: Usuario;
-    isEditing?: boolean;
+    isEditing: boolean;
     roles: RoleOption[];
+    dependencias: DependenciaOption[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
     isEditing: false,
-    roles: [],
+    roles: () => [] as RoleOption[],
+    dependencias: () => [] as DependenciaOption[],
 });
 
 // Títulos dinámicos
@@ -59,25 +65,8 @@ const pageDescription = computed(() =>
         : 'Ingresa los datos para crear un nuevo usuario en el sistema.',
 );
 
-// defineOptions({
-//     layout: {
-//         title: 'Usuarios',
-//         breadcrumbs: [
-//             {
-//                 title: 'Usuarios',
-//                 href: adminRoutes.usuarios().url,
-//             },
-//         ],
-//     },
-// });
-
-const dependenciasSource = [
-    { id_dependencia: 1, value: 1, label: 'Departamento TI' },
-    { id_dependencia: 2, value: 2, label: 'Recursos Humanos' },
-    { id_dependencia: 3, value: 3, label: 'Finanzas' },
-];
-
 const rolesSource = computed(() => props.roles || []);
+const dependenciasSource = computed(() => props.dependencias || []);
 
 const form = useForm({
     name: props.usuario?.name || '',
@@ -92,9 +81,7 @@ const form = useForm({
 
 const handleSubmit = () => {
     if (props.isEditing && props.usuario) {
-        // En lugar de route('usuarios.update', id), usas tu importación:
         form.put(usuarios.update(props.usuario.id).url, {
-            // <--- .url es la clave
             onSuccess: () => {
                 Swal.fire({
                     icon: 'success',
@@ -109,9 +96,7 @@ const handleSubmit = () => {
             },
         });
     } else {
-        // Para crear un nuevo usuario:
         form.post(usuarios.store().url, {
-            // <--- .url
             onSuccess: () => {
                 Swal.fire({
                     icon: 'success',
@@ -258,10 +243,10 @@ const handleCancel = () => {
                                 >
                                 <SelectItem
                                     v-for="item in dependenciasSource"
-                                    :key="item.value"
-                                    :value="item.value"
+                                    :key="item.id"
+                                    :value="item.id"
                                 >
-                                    {{ item.label }}
+                                    {{ item.descripcion }}
                                 </SelectItem>
                             </SelectGroup>
                         </SelectContent>
