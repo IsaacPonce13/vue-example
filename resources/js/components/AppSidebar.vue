@@ -1,13 +1,7 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import {
-    House,
-    LayoutGrid,
-    Users,
-    KeyRound,
-    SquareLibrary,
-} from 'lucide-vue-next';
+import { House, LayoutGrid, Users, KeyRound, Landmark } from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -26,36 +20,55 @@ import type { NavItem } from '@/types';
 
 const page = usePage();
 const auth = computed(() => page.props.auth || {});
+type NavGroup = {
+    label: string;
+    items: NavItem[];
+};
 
-const mainNavItems: NavItem[] = [
+const navGroups: NavGroup[] = [
     {
-        title: 'Inicio',
-        href: dashboard(),
-        icon: House,
+        label: 'Principal',
+        items: [
+            {
+                title: 'Inicio',
+                href: dashboard(),
+                icon: House,
+            },
+        ],
     },
     {
-        title: 'Modulos',
-        href: modulos(),
-        icon: LayoutGrid,
-        permission: 'modulos',
+        label: 'Administrador',
+        items: [
+            {
+                title: 'Usuarios',
+                href: '/admin/usuarios',
+                icon: Users,
+                permission: 'usuarios',
+            },
+            {
+                title: 'Roles y permisos',
+                href: '/admin/roles',
+                icon: KeyRound,
+                permission: 'roles',
+            },
+            {
+                title: 'Dependencias',
+                href: '/admin/dependencias',
+                icon: Landmark,
+                permission: 'dependencias',
+            },
+        ],
     },
     {
-        title: 'Usuarios',
-        href: '/admin/usuarios',
-        icon: Users,
-        permission: 'usuarios',
-    },
-    {
-        title: 'Roles y permisos',
-        href: '/admin/roles',
-        icon: KeyRound,
-        permission: 'roles',
-    },
-    {
-        title: 'Catalogos',
-        href: '/admin/catalogos',
-        icon: SquareLibrary,
-        // permission: 'catalogos',
+        label: 'Contenidos',
+        items: [
+            {
+                title: 'Modulos',
+                href: modulos(),
+                icon: LayoutGrid,
+                permission: 'modulos',
+            },
+        ],
     },
 ];
 
@@ -72,13 +85,20 @@ const footerNavItems: NavItem[] = [
     // },
 ];
 
-const visibleMainNavItems = computed(() => {
+const visibleNavGroups = computed(() => {
     const userPermissions = auth.value.permissions;
     const permissions = Array.isArray(userPermissions) ? userPermissions : [];
 
-    return mainNavItems.filter((item) => {
-        return !item.permission || permissions.includes(item.permission);
-    });
+    return navGroups
+        .map((group) => ({
+            ...group,
+            items: group.items.filter((item) => {
+                return (
+                    !item.permission || permissions.includes(item.permission)
+                );
+            }),
+        }))
+        .filter((group) => group.items.length > 0);
 });
 </script>
 
@@ -97,7 +117,7 @@ const visibleMainNavItems = computed(() => {
         </SidebarHeader>
 
         <SidebarContent>
-            <NavMain :items="visibleMainNavItems" />
+            <NavMain :groups="visibleNavGroups" />
         </SidebarContent>
 
         <SidebarFooter>

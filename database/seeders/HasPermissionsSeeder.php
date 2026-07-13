@@ -22,7 +22,6 @@ class HasPermissionsSeeder extends Seeder
             'modulos.create',
             'modulos.show',
             'modulos.edit',
-            'modulos.destroy',
             'usuarios',
             'usuarios.create',
             'usuarios.show',
@@ -41,6 +40,11 @@ class HasPermissionsSeeder extends Seeder
             'permisos.edit',
             'permisos.password',
             'permisos.estado',
+            'dependencias',
+            'dependencias.create',
+            'dependencias.show',
+            'dependencias.edit',
+            'dependencias.estado',
         ];
 
         // Crear permisos si no existen

@@ -1,50 +1,31 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import usuariosRoutes from '@/routes/admin/usuarios';
+import dependenciasRoutes from '@/routes/admin/dependencias';
 import { router } from '@inertiajs/vue3';
-
-import {
-    SquarePen,
-    ToggleRight,
-    ToggleLeft,
-    LockKeyhole,
-} from 'lucide-vue-next';
-
-import ModalPassword from '@/components/usuarios/modalPassword.vue';
+import { SquarePen, ToggleRight, ToggleLeft } from 'lucide-vue-next';
+// import ModalPassword from '@/components/dependencias/modalPassword.vue';
 import Swal from 'sweetalert2';
 import { DataTable } from 'datatables.net-vue3';
 
-interface users {
+interface dependencias {
     id: number;
-    name: string;
-    primer_apellido: string;
-    segundo_apellido: string | null;
-    numero_control: string;
-    id_rol: number;
-    id_dependencia: number;
+    descripcion: string;
+    adscripcion: string;
+    shortname: string;
+    tipo_dependencia: string;
+    email: string;
     active?: boolean;
 }
 
 interface Props {
-    users: users[];
+    dependencias: dependencias[];
 }
 
 const props = defineProps<Props>();
-const users = props.users || [];
+const dependencias = props.dependencias || [];
 
-const isModalOpen = ref(false);
-const selectedUser = ref<users | null>(null);
-
-const openPasswordModal = (user: users) => {
-    selectedUser.value = user;
-    isModalOpen.value = true;
-};
-
-const closePasswordModal = () => {
-    isModalOpen.value = false;
-    selectedUser.value = null;
-};
+const selectedDependencia = ref<dependencias | null>(null);
 
 const cambiarEstado = (id: number, active: number) => {
     Swal.fire({
@@ -59,7 +40,7 @@ const cambiarEstado = (id: number, active: number) => {
     }).then((result) => {
         if (result.isConfirmed) {
             router.put(
-                `/admin/usuarios/${id}/estado`,
+                `/admin/dependencias/${id}/estado`,
                 { active },
                 {
                     preserveScroll: true,
@@ -78,37 +59,16 @@ const cambiarEstado = (id: number, active: number) => {
 };
 
 const columns = [
+    { title: 'Id', data: 'id' },
+    { title: 'Descripción', data: 'descripcion', className: 'dt-left' },
+    { title: 'Adscripción', data: 'adscripcion', className: 'dt-left' },
+    { title: 'Shortname', data: 'shortname', className: 'dt-left' },
     {
-        title: 'Número de control',
-        data: 'numero_control',
+        title: 'Tipo de dependencia',
+        data: 'tipo_dependencia',
         className: 'dt-left',
     },
-    {
-        title: 'Nombre',
-        data: null,
-        className: 'dt-left',
-        render: (usuario: any) => {
-            const parts = [
-                usuario.name,
-                usuario.primer_apellido,
-                usuario.segundo_apellido,
-            ].filter(Boolean);
-            return parts.join(' ');
-        },
-    },
-    {
-        title: 'Rol',
-        data: null,
-        className: 'dt-left',
-        render: (usuario: any) => {
-            return usuario.roles?.[0]?.name || `#${usuario.id_rol}`;
-        },
-    },
-    {
-        title: 'Dependencia',
-        data: 'id_dependencia',
-        className: 'dt-left',
-    },
+    { title: 'Email', data: 'email', className: 'dt-left' },
     {
         title: 'Acciones',
         data: null,
@@ -117,7 +77,6 @@ const columns = [
         cellType: 'th',
     },
 ];
-
 const options = {
     responsive: true,
     dom: '<"flex items-center justify-between mb-4"lf>rt<"flex items-center justify-between mt-4"ip>',
@@ -134,6 +93,7 @@ const options = {
     },
 };
 </script>
+
 <template>
     <Head title="Administrador" />
 
@@ -141,25 +101,25 @@ const options = {
         class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
     >
         <div class="mb-2 flex items-center justify-between gap-4">
-            <h1 class="text-brand-gray text-2xl font-bold">Usuarios</h1>
+            <h1 class="text-brand-gray text-2xl font-bold">Dependencias</h1>
             <Link
-                :href="usuariosRoutes.create().url"
+                :href="dependenciasRoutes.create().url"
                 as="button"
                 id="btnNuevo"
                 class="ml-auto cursor-pointer rounded-lg bg-primary px-4 py-2 text-white transition-colors duration-300 hover:bg-secondary"
             >
-                Nuevo usuario
+                Agregar dependencia
             </Link>
         </div>
 
         <div class="rounded-lg bg-white p-6 shadow-xl">
             <DataTable
-                :data="users"
+                :data="dependencias"
                 :columns="columns"
                 :options="options"
                 class="w-full"
             >
-                <template #column-4="{ cellData, rowData }">
+                <template #column-6="{ cellData, rowData }">
                     <div class="flex items-center gap-3">
                         <button
                             type="button"
@@ -183,29 +143,15 @@ const options = {
                         </button>
 
                         <Link
-                            :href="`/admin/usuarios/${rowData.id}/editar`"
+                            :href="`/admin/dependencias/${rowData.id}/editar`"
                             class="text-yellow-600 transition-colors hover:text-yellow-800"
                             title="Editar usuario"
                         >
                             <SquarePen class="h-5 w-5" />
                         </Link>
-
-                        <button
-                            @click="openPasswordModal(rowData)"
-                            class="text-blue-600 transition-colors hover:text-blue-800"
-                            type="button"
-                            title="Cambiar contraseña"
-                        >
-                            <LockKeyhole class="h-5 w-5" />
-                        </button>
                     </div>
                 </template>
             </DataTable>
         </div>
-        <ModalPassword
-            :is-open="isModalOpen"
-            :user="selectedUser"
-            @close="closePasswordModal"
-        />
     </div>
 </template>

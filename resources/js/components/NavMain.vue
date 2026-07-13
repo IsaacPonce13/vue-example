@@ -10,18 +10,23 @@ import {
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import type { NavItem } from '@/types';
 
-defineProps<{
+type NavGroup = {
+    label: string;
     items: NavItem[];
+};
+
+defineProps<{
+    groups: NavGroup[];
 }>();
 
 const { isCurrentUrl } = useCurrentUrl();
 </script>
 
 <template>
-    <SidebarGroup class="px-2 py-0">
-        <SidebarGroupLabel>Administrador</SidebarGroupLabel>
+    <SidebarGroup v-for="group in groups" :key="group.label">
+        <SidebarGroupLabel>{{ group.label }}</SidebarGroupLabel>
         <SidebarMenu>
-            <SidebarMenuItem v-for="item in items" :key="item.title">
+            <SidebarMenuItem v-for="item in group.items" :key="item.title">
                 <SidebarMenuButton
                     as-child
                     :is-active="isCurrentUrl(item.href)"

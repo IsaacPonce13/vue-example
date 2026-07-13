@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\UsuariosController;
 use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\PermisosController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\DependenciasController;
+
 
 // Todas las rutas aquí ya tienen el prefijo /admin y middleware auth
 Route::middleware(['verified'])->group(function () {
@@ -77,6 +79,28 @@ Route::middleware(['verified'])->group(function () {
             Route::get('/{id}/editar', [PermisosController::class, 'edit'])->name('edit');
             Route::put('/{id}', [PermisosController::class, 'update'])->name('update');
             Route::put('/{id}/estado', [PermisosController::class, 'estado'])->name('estado');
+        });
+    });
+
+    // ==========================================
+    // RUTAS DE DEPENDENCIAS
+    // ==========================================
+    Route::prefix('dependencias')->name('dependencias.')->group(function () {
+        
+        Route::middleware(['can:dependencias'])->group(function () {
+            Route::get('/', [DependenciasController::class, 'index'])->name('index');
+            Route::get('/{id}/ver', [DependenciasController::class, 'show'])->name('show');
+        });
+
+        Route::middleware(['can:dependencias.create'])->group(function () {
+            Route::get('/crear', [DependenciasController::class, 'create'])->name('create');
+            Route::post('/', [DependenciasController::class, 'store'])->name('store');
+        });
+
+        Route::middleware(['can:dependencias.edit'])->group(function () {
+            Route::get('/{id}/editar', [DependenciasController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [DependenciasController::class, 'update'])->name('update');
+            Route::put('/{id}/estado', [DependenciasController::class, 'estado'])->name('estado');
         });
     });
 });

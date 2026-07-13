@@ -32,13 +32,13 @@ class RoleSeeder extends Seeder
         ]);
 
         // Permisos modulos
-        Permission::create(['name' => 'modulos'])->syncRoles([$role1, $role2]);
-        Permission::create(['name' => 'modulos.create'])->syncRoles([$role1, $role2]);
-        Permission::create(['name' => 'modulos.show'])->syncRoles([$role1, $role2]);
-        Permission::create(['name' => 'modulos.edit'])->syncRoles([$role1, $role2]);
-        Permission::create(['name' => 'modulos.store'])->syncRoles([$role1, $role2]);
-        Permission::create(['name' => 'modulos.update'])->syncRoles([$role1, $role2]);
-        Permission::create(['name' => 'modulos.estado'])->syncRoles([$role1, $role2]);
+        Permission::create(['name' => 'modulos'])->syncRoles([$role1, $role2, $role3]);
+        Permission::create(['name' => 'modulos.create'])->syncRoles([$role1, $role2, $role3]);
+        Permission::create(['name' => 'modulos.show'])->syncRoles([$role1, $role2, $role3]);
+        Permission::create(['name' => 'modulos.edit'])->syncRoles([$role1, $role2, $role3]);
+        Permission::create(['name' => 'modulos.store'])->syncRoles([$role1, $role2, $role3]);
+        Permission::create(['name' => 'modulos.update'])->syncRoles([$role1, $role2, $role3]);
+        Permission::create(['name' => 'modulos.estado'])->syncRoles([$role1, $role2, $role3]);
 
         // Permisos usuairos
         Permission::create(['name' => 'usuarios'])->syncRoles([$role1]);
@@ -66,6 +66,14 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'permisos.edit'])->syncRoles([$role1]);
         Permission::create(['name' => 'permisos.store'])->syncRoles([$role1]);
         Permission::create(['name' => 'permisos.update'])->syncRoles([$role1]);
+
+        // Permisos dependencias
+        Permission::create(['name' => 'dependencias'])->syncRoles([$role1]);
+        Permission::create(['name' => 'dependencias.create'])->syncRoles([$role1]);
+        Permission::create(['name' => 'dependencias.show'])->syncRoles([$role1]);
+        Permission::create(['name' => 'dependencias.edit'])->syncRoles([$role1]);
+        Permission::create(['name' => 'dependencias.store'])->syncRoles([$role1]);
+        Permission::create(['name' => 'dependencias.update'])->syncRoles([$role1]);
 
     }
 
