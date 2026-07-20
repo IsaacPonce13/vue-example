@@ -32,9 +32,9 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const selectedRol = ref<Role | null>(null);
 
 const isModalOpen = ref(false);
-const selectedRol = ref<Role | null>(null);
 const availablePermissions = computed(() => {
     if (Array.isArray(props.permissions) && props.permissions.length > 0) {
         return props.permissions;
@@ -55,7 +55,7 @@ const openEditModal = (roleData: Role) => {
     fetch(`/admin/roles/${roleData.id}/ver`)
         .then((response) => response.json())
         .then((data) => {
-            console.log('📥 Rol obtenido del servidor:', data);
+            console.log('Rol obtenido del servidor:', data);
             selectedRol.value = data;
             isModalOpen.value = true;
         })

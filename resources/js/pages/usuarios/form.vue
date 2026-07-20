@@ -92,7 +92,7 @@ const handleSubmit = () => {
                 });
             },
             onError: (errors) => {
-                console.error('❌ [FORM] Errores de validación:', errors);
+                console.error('[FORM] Errores de validación:', errors);
             },
         });
     } else {
@@ -107,15 +107,14 @@ const handleSubmit = () => {
                 });
             },
             onError: (errors) => {
-                console.error('❌ [FORM] Errores de validación:', errors);
+                console.error('[FORM] Errores de validación:', errors);
             },
         });
     }
 };
 
 const handleCancel = () => {
-    // Para regresar a la tabla principal de usuarios sin usar Ziggy:
-    router.visit(usuarios.index().url); // <--- .url
+    router.visit(usuarios.index().url);
 };
 </script>
 
