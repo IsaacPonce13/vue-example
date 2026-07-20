@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Modulos;
+use App\Models\CategoriasModulos;
+use App\Models\TipoModulos;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Log;
 
@@ -11,7 +13,7 @@ class ModuloController extends Controller
     public function index()
     {
         $modulos = Modulos::paginate(12);
-        Log::info('Datos del modulo', ['Modulo' => $modulos]);
+
         return Inertia::render('modulos/index', [
             'modulos' => $modulos
         ]);
@@ -19,7 +21,16 @@ class ModuloController extends Controller
 
     public function create()
     {
-        return Inertia::render('modulos/form');
+        $detalleTypeSource = Modulos::select('detalle_id', 'detalle_type')->orderBy('detalle_type')->get();
+        $categoriaSource = CategoriasModulos::select('id', 'descripcion')->orderBy('descripcion')->get();
+        $tipoModuloSource = TipoModulos::select('id', 'descripcion')->orderBy('descripcion')->get();
+        Log::info("Info de modulos: {$detalleTypeSource}, Categorias: {$categoriaSource}, tips: {$tipoModuloSource}");
+
+        return Inertia::render('modulos/form', [
+            'detalleTypeSource' => $detalleTypeSource,
+            'categoriaSource' => $categoriaSource,
+            'tipoModuloSource' => $tipoModuloSource
+        ]);
     }
 
     public function edit($id)

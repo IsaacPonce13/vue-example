@@ -21,12 +21,8 @@ import EditorTexto from '@/components/modulos/EditorTexto.vue';
 import InputFechas from '@/components/modulos/InputFechas.vue';
 
 interface DetalleTypeOptions {
-    id: number;
-    descripcion: string;
-}
-interface DetalleIdOptions {
-    id: number;
-    descripcion: string;
+    detalle_id: number;
+    detalle_type: string;
 }
 
 interface IdCategoriaOptions {
@@ -42,10 +38,9 @@ interface TipoModuloOptions {
 interface Props {
     modulo?: Modulo;
     isEditing: boolean;
-    detalle_type: DetalleTypeOptions[];
-    detalle_id: DetalleIdOptions[];
-    id_categorias: IdCategoriaOptions[];
-    tipo_modulo: TipoModuloOptions[];
+    detalleTypeSource: DetalleTypeOptions[];
+    categoriaSource: IdCategoriaOptions[];
+    tipoModuloSource: TipoModuloOptions[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -77,10 +72,9 @@ const form = useForm({
     fecha_baja: props.modulo?.fecha_baja || '',
 });
 
-const detalleTypeSource = computed(() => props.detalle_type || []);
-const detalleIdSource = computed(() => props.detalle_id || []);
-const categoriaSource = computed(() => props.id_categorias || []);
-const tipoModuloSource = computed(() => props.tipo_modulo || []);
+const detalleTypeSource = computed(() => props.detalleTypeSource || []);
+const categoriaSource = computed(() => props.categoriaSource || []);
+const tipoModuloSource = computed(() => props.tipoModuloSource || []);
 
 const handleSubmit = () => {
     if (props.isEditing && props.modulo) {
@@ -138,7 +132,7 @@ const handleCancel = () => {
                         type="text"
                         :tabindex="2"
                         autocomplete="nombre"
-                        placeholder="Ej. SEGOB, Finanzas"
+                        placeholder="Ingrese el nombre del modulo"
                     />
                     <p v-if="form.errors.nombre" class="text-sm text-red-600">
                         {{ form.errors.nombre }}
@@ -177,10 +171,10 @@ const handleCancel = () => {
                                 <SelectLabel>Tipo de detalle</SelectLabel>
                                 <SelectItem
                                     v-for="item in detalleTypeSource"
-                                    :value="item.id"
-                                    :key="item.id"
+                                    :value="item.detalle_id"
+                                    :key="item.detalle_id"
                                 >
-                                    {{ item.descripcion }}
+                                    {{ item.detalle_type }}
                                 </SelectItem>
                             </SelectGroup>
                         </SelectContent>
